@@ -193,6 +193,33 @@ func NewEndReturnResultLastWithDialogue(dtid []byte, invID int, opCode *uint8, p
 	return tcTcap
 }
 
+// NewContinue create a Continue tcap message
+// otid and dtid size from 1 to 4 bytes in BigEndian format
+func NewContinue(otid []byte, dtid []byte) *TCAP {
+	return NewContinueWithDialogue(otid, dtid, nil, nil)
+}
+
+// NewContinueWithDialogue create a Continue tcap message with a dialogue
+// otid size from 1 to 4 bytes in BigEndian format
+func NewContinueWithDialogue(otid []byte, dtid []byte, acn *int, acnVersion *int) *TCAP {
+	tcTcap := &TCAP{}
+	tcTcap.Continue = &ContinueTCAP{}
+
+	tcTcap.Continue.Otid = otid
+	tcTcap.Continue.Dtid = dtid
+
+	if acn != nil && acnVersion != nil {
+		tcTcap.Continue.Dialogue = &DialogueTCAP{}
+		tcTcap.Continue.Dialogue.DialogueRequest = &AARQapduTCAP{}
+
+		tcTcap.Continue.Dialogue.DialogAsId = []int{0, 0, 17, 773, 1, 1, 1}
+		tcTcap.Continue.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(128) // protocol version 128 = 0x80
+		tcTcap.Continue.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, *acn, *acnVersion}
+	}
+
+	return tcTcap
+}
+
 // NewContinueInvoke create a Continue Invoke tcap message
 // otid and dtid size from 1 to 4 bytes in BigEndian format
 func NewContinueInvoke(otid []byte, dtid []byte, invID int, opCode uint8, payload []byte) *TCAP {
