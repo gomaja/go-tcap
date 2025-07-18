@@ -222,10 +222,10 @@ func NewContinueWithDialogue(otid []byte, dtid []byte, acn *int, acnVersion *int
 
 // NewContinueWithDialogueObject creates a Continue TCAP message with a dialogue object.
 // Parameters:
-// - otid: Originating Transaction ID, size from 1 to 4 bytes in BigEndian format.
-// - dtid: Destination Transaction ID, size from 1 to 4 bytes in BigEndian format.
-// - dialogueObject: A pointer to a DialogueTCAP object, representing the dialogue to include in the message.
-//   If nil, no dialogue will be included in the message.
+//   - otid: Originating Transaction ID, size from 1 to 4 bytes in BigEndian format.
+//   - dtid: Destination Transaction ID, size from 1 to 4 bytes in BigEndian format.
+//   - dialogueObject: A pointer to a DialogueTCAP object, representing the dialogue to include in the message.
+//     If nil, no dialogue will be included in the message.
 func NewContinueWithDialogueObject(otid []byte, dtid []byte, dialogueObject *DialogueTCAP) *TCAP {
 	tcTcap := &TCAP{}
 	tcTcap.Continue = &ContinueTCAP{}
@@ -244,7 +244,7 @@ func NewContinueInvoke(otid []byte, dtid []byte, invID int, opCode uint8, payloa
 	return NewContinueInvokeWithDialogue(otid, dtid, invID, opCode, payload, nil, nil)
 }
 
-// NewContinueInvokeWithDialogue create a Begin Continue tcap message with a dialogue
+// NewContinueInvokeWithDialogue create a Continue Invoke tcap message with a dialogue
 // otid and dtid size from 1 to 4 bytes in BigEndian format
 func NewContinueInvokeWithDialogue(otid, dtid []byte, invID int, opCode uint8, payload []byte, acn *int, acnVersion *int) *TCAP {
 	tcTcap := &TCAP{}
@@ -266,6 +266,61 @@ func NewContinueInvokeWithDialogue(otid, dtid []byte, invID int, opCode uint8, p
 		tcTcap.Continue.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(128) // protocol version 128 = 0x80
 		tcTcap.Continue.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, *acn, *acnVersion}
 	}
+
+	return tcTcap
+}
+
+// NewContinueReturnResultLast create an Continue ReturnResultLast tcap message
+// dtid size from 1 to 4 bytes in BigEndian format
+func NewContinueReturnResultLast(otid, dtid []byte, invID int, opCode *uint8, payload []byte) *TCAP {
+	return NewContinueReturnResultLastWithDialogue(otid, dtid, invID, opCode, payload, nil, nil)
+}
+
+// NewContinueReturnResultLastWithDialogue create an Continue ReturnResultLast tcap message with a dialogue
+// dtid size from 1 to 4 bytes in BigEndian format
+func NewContinueReturnResultLastWithDialogue(otid, dtid []byte, invID int, opCode *uint8, payload []byte, acn *int, acnVersion *int) *TCAP {
+	tcTcap := &TCAP{}
+	tcTcap.Continue = &ContinueTCAP{}
+	tcTcap.Continue.Components = &ComponentTCAP{}
+	tcTcap.Continue.Components.ReturnResultLast = &ReturnResultTCAP{}
+
+	tcTcap.Continue.Otid = otid
+	tcTcap.Continue.Dtid = dtid
+	tcTcap.Continue.Components.ReturnResultLast.InvokeID = invID
+	tcTcap.Continue.Components.ReturnResultLast.OpCode = opCode
+	tcTcap.Continue.Components.ReturnResultLast.Parameter = payload
+
+	if acn != nil && acnVersion != nil {
+		tcTcap.Continue.Dialogue = &DialogueTCAP{}
+		tcTcap.Continue.Dialogue.DialogueRequest = &AARQapduTCAP{}
+
+		tcTcap.Continue.Dialogue.DialogAsId = []int{0, 0, 17, 773, 1, 1, 1}
+		tcTcap.Continue.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(128) // protocol version 128 = 0x80
+		tcTcap.Continue.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, *acn, *acnVersion}
+	}
+
+	return tcTcap
+}
+
+// NewContinueReturnResultLastWithDialogueObject creates a Continue ReturnResultLast TCAP message with a dialogue object.
+// Parameters:
+//   - otid: Originating Transaction ID, size from 1 to 4 bytes in BigEndian format.
+//   - dtid: Destination Transaction ID, size from 1 to 4 bytes in BigEndian format.
+//   - dialogueObject: A pointer to a DialogueTCAP object, representing the dialogue to include in the message.
+//     If nil, no dialogue will be included in the message.
+func NewContinueReturnResultLastWithDialogueObject(otid, dtid []byte, invID int, opCode *uint8, payload []byte, dialogueObject *DialogueTCAP) *TCAP {
+	tcTcap := &TCAP{}
+	tcTcap.Continue = &ContinueTCAP{}
+	tcTcap.Continue.Components = &ComponentTCAP{}
+	tcTcap.Continue.Components.ReturnResultLast = &ReturnResultTCAP{}
+
+	tcTcap.Continue.Otid = otid
+	tcTcap.Continue.Dtid = dtid
+	tcTcap.Continue.Components.ReturnResultLast.InvokeID = invID
+	tcTcap.Continue.Components.ReturnResultLast.OpCode = opCode
+	tcTcap.Continue.Components.ReturnResultLast.Parameter = payload
+	// Assign the dialogueObject to the Dialogue field. If dialogueObject is nil, no dialogue will be included.
+	tcTcap.Continue.Dialogue = dialogueObject
 
 	return tcTcap
 }
