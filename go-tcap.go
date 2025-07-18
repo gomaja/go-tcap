@@ -270,14 +270,16 @@ func NewContinueInvokeWithDialogue(otid, dtid []byte, invID int, opCode uint8, p
 	return tcTcap
 }
 
-// NewContinueReturnResultLast create an Continue ReturnResultLast tcap message
-// dtid size from 1 to 4 bytes in BigEndian format
+// NewContinueReturnResultLast creates a Continue ReturnResultLast TCAP message.
+// otid and dtid are transaction IDs, each with a size of 1 to 4 bytes in BigEndian format.
 func NewContinueReturnResultLast(otid, dtid []byte, invID int, opCode *uint8, payload []byte) *TCAP {
 	return NewContinueReturnResultLastWithDialogue(otid, dtid, invID, opCode, payload, nil, nil)
 }
 
-// NewContinueReturnResultLastWithDialogue create an Continue ReturnResultLast tcap message with a dialogue
-// dtid size from 1 to 4 bytes in BigEndian format
+// NewContinueReturnResultLastWithDialogue creates a Continue ReturnResultLast TCAP message with a dialogue.
+// Parameters:
+//   - otid: Originating Transaction ID, size from 1 to 4 bytes in BigEndian format.
+//   - dtid: Destination Transaction ID, size from 1 to 4 bytes in BigEndian format.
 func NewContinueReturnResultLastWithDialogue(otid, dtid []byte, invID int, opCode *uint8, payload []byte, acn *int, acnVersion *int) *TCAP {
 	tcTcap := &TCAP{}
 	tcTcap.Continue = &ContinueTCAP{}
