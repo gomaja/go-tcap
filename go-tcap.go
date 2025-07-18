@@ -220,7 +220,7 @@ func NewContinueWithDialogue(otid []byte, dtid []byte, acn *int, acnVersion *int
 	return tcTcap
 }
 
-// NewContinueWithDialogueObject create a Continue tcap message with a dialogue object
+// NewContinueWithDialogueObject creates a Continue tcap message with a dialogue object
 // otid size from 1 to 4 bytes in BigEndian format
 func NewContinueWithDialogueObject(otid []byte, dtid []byte, dialogueObject *DialogueTCAP) *TCAP {
 	tcTcap := &TCAP{}
