@@ -193,6 +193,27 @@ func NewEndReturnResultLastWithDialogue(dtid []byte, invID int, opCode *uint8, p
 	return tcTcap
 }
 
+// NewEndReturnResultLastWithDialogueObject create an End ReturnResultLast tcap message with a dialogue object
+// Parameters:
+//   - otid: Originating Transaction ID, size from 1 to 4 bytes in BigEndian format.
+//   - dialogueObject: A pointer to a DialogueTCAP object, representing the dialogue to include in the message.
+//     If nil, no dialogue will be included in the message.
+func NewEndReturnResultLastWithDialogueObject(dtid []byte, invID int, opCode *uint8, payload []byte, dialogueObject *DialogueTCAP) *TCAP {
+	tcTcap := &TCAP{}
+	tcTcap.End = &EndTCAP{}
+	tcTcap.End.Components = &ComponentTCAP{}
+	tcTcap.End.Components.ReturnResultLast = &ReturnResultTCAP{}
+
+	tcTcap.End.Dtid = dtid
+	tcTcap.End.Components.ReturnResultLast.InvokeID = invID
+	tcTcap.End.Components.ReturnResultLast.OpCode = opCode
+	tcTcap.End.Components.ReturnResultLast.Parameter = payload
+	// Assign the dialogueObject to the Dialogue field. If dialogueObject is nil, no dialogue will be included.
+	tcTcap.End.Dialogue = dialogueObject
+
+	return tcTcap
+}
+
 // NewContinue create a Continue tcap message
 // otid and dtid size from 1 to 4 bytes in BigEndian format
 func NewContinue(otid []byte, dtid []byte) *TCAP {
