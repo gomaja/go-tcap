@@ -220,6 +220,22 @@ func NewContinueWithDialogue(otid []byte, dtid []byte, acn *int, acnVersion *int
 	return tcTcap
 }
 
+// NewContinueWithDialogueObject create a Continue tcap message with a dialogue object
+// otid size from 1 to 4 bytes in BigEndian format
+func NewContinueWithDialogueObject(otid []byte, dtid []byte, dialogueObject *DialogueTCAP) *TCAP {
+	tcTcap := &TCAP{}
+	tcTcap.Continue = &ContinueTCAP{}
+
+	tcTcap.Continue.Otid = otid
+	tcTcap.Continue.Dtid = dtid
+
+	if dialogueObject != nil {
+		tcTcap.Continue.Dialogue = dialogueObject
+	}
+
+	return tcTcap
+}
+
 // NewContinueInvoke create a Continue Invoke tcap message
 // otid and dtid size from 1 to 4 bytes in BigEndian format
 func NewContinueInvoke(otid []byte, dtid []byte, invID int, opCode uint8, payload []byte) *TCAP {
