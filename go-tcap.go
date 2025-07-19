@@ -71,7 +71,7 @@ type ABRTapduTCAP struct {
 	UserInformation []byte
 }
 
-// ComponentTCAP will have only one field fulfilled and the others will be nil, except MoreComponents may exist additionally to any other field
+// ComponentTCAP will have only one field fulfilled, and the others will be nil, except MoreComponents may exist additionally to any other field
 type ComponentTCAP struct { // choice Invoke, ReturnResultLast, ReturnError, Reject, ReturnResultNotLast
 	Invoke              *InvokeTCAP
 	ReturnResultLast    *ReturnResultTCAP
@@ -79,7 +79,7 @@ type ComponentTCAP struct { // choice Invoke, ReturnResultLast, ReturnError, Rej
 	Reject              *RejectTCAP
 	ReturnResultNotLast *ReturnResultTCAP
 
-	// Linked list here to include presence of more than one component
+	// Linked list here to include the presence of more than one component
 	MoreComponents *ComponentTCAP
 }
 
@@ -105,130 +105,6 @@ type RejectTCAP struct {
 	InvokeProblem           *uint8
 	ReturnResultProblem     *uint8
 	ReturnErrorProblem      *uint8
-}
-
-// NewBegin create a Begin tcap message
-// otid size from 1 to 4 bytes in BigEndian format
-func NewBegin(otid []byte) (*TCAP, error) {
-	if err := validateTransactionID(otid, "otid"); err != nil {
-		return nil, err
-	}
-	return NewBeginWithDialogue(otid, nil, nil), nil
-}
-
-// NewBeginWithDialogue create a Begin tcap message with a dialogue
-// otid size from 1 to 4 bytes in BigEndian format
-func NewBeginWithDialogue(otid []byte, acn *int, acnVersion *int) *TCAP {
-	tcTcap := &TCAP{}
-	tcTcap.Begin = &BeginTCAP{}
-
-	tcTcap.Begin.Otid = otid
-
-	if acn != nil && acnVersion != nil {
-		tcTcap.Begin.Dialogue = &DialogueTCAP{}
-		tcTcap.Begin.Dialogue.DialogueRequest = &AARQapduTCAP{}
-
-		tcTcap.Begin.Dialogue.DialogAsId = DefaultDialogueAsId
-		tcTcap.Begin.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
-		tcTcap.Begin.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, *acn, *acnVersion}
-	}
-
-	return tcTcap
-}
-
-// NewBeginInvoke create a Begin Invoke tcap message
-// otid size from 1 to 4 bytes in BigEndian format
-func NewBeginInvoke(otid []byte, invID int, opCode uint8, payload []byte) (*TCAP, error) {
-	if err := validateTransactionID(otid, "otid"); err != nil {
-		return nil, err
-	}
-	if err := validateInvokeID(invID, "invID"); err != nil {
-		return nil, err
-	}
-	return NewBeginInvokeWithDialogue(otid, invID, opCode, payload, nil, nil), nil
-}
-
-// NewBeginInvokeWithDialogue create a Begin Invoke tcap message with a dialogue
-// otid size from 1 to 4 bytes in BigEndian format
-func NewBeginInvokeWithDialogue(otid []byte, invID int, opCode uint8, payload []byte, acn *int, acnVersion *int) *TCAP {
-	tcTcap := &TCAP{}
-	tcTcap.Begin = &BeginTCAP{}
-	tcTcap.Begin.Components = &ComponentTCAP{}
-	tcTcap.Begin.Components.Invoke = &InvokeTCAP{}
-
-	tcTcap.Begin.Otid = otid
-	tcTcap.Begin.Components.Invoke.InvokeID = invID
-	tcTcap.Begin.Components.Invoke.OpCode = opCode
-	tcTcap.Begin.Components.Invoke.Parameter = payload
-
-	if acn != nil && acnVersion != nil {
-		tcTcap.Begin.Dialogue = &DialogueTCAP{}
-		tcTcap.Begin.Dialogue.DialogueRequest = &AARQapduTCAP{}
-
-		tcTcap.Begin.Dialogue.DialogAsId = DefaultDialogueAsId
-		tcTcap.Begin.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
-		tcTcap.Begin.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, *acn, *acnVersion}
-	}
-
-	return tcTcap
-}
-
-// NewEndReturnResultLast create an End ReturnResultLast tcap message
-// dtid size from 1 to 4 bytes in BigEndian format
-func NewEndReturnResultLast(dtid []byte, invID int, opCode *uint8, payload []byte) (*TCAP, error) {
-	if err := validateTransactionID(dtid, "dtid"); err != nil {
-		return nil, err
-	}
-	if err := validateInvokeID(invID, "invID"); err != nil {
-		return nil, err
-	}
-	return NewEndReturnResultLastWithDialogue(dtid, invID, opCode, payload, nil, nil), nil
-}
-
-// NewEndReturnResultLastWithDialogue create an End ReturnResultLast tcap message with a dialogue
-// dtid size from 1 to 4 bytes in BigEndian format
-func NewEndReturnResultLastWithDialogue(dtid []byte, invID int, opCode *uint8, payload []byte, acn *int, acnVersion *int) *TCAP {
-	tcTcap := &TCAP{}
-	tcTcap.End = &EndTCAP{}
-	tcTcap.End.Components = &ComponentTCAP{}
-	tcTcap.End.Components.ReturnResultLast = &ReturnResultTCAP{}
-
-	tcTcap.End.Dtid = dtid
-	tcTcap.End.Components.ReturnResultLast.InvokeID = invID
-	tcTcap.End.Components.ReturnResultLast.OpCode = opCode
-	tcTcap.End.Components.ReturnResultLast.Parameter = payload
-
-	if acn != nil && acnVersion != nil {
-		tcTcap.End.Dialogue = &DialogueTCAP{}
-		tcTcap.End.Dialogue.DialogueRequest = &AARQapduTCAP{}
-
-		tcTcap.End.Dialogue.DialogAsId = DefaultDialogueAsId
-		tcTcap.End.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
-		tcTcap.End.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, *acn, *acnVersion}
-	}
-
-	return tcTcap
-}
-
-// NewEndReturnResultLastWithDialogueObject creates an End ReturnResultLast tcap message with a dialogue object
-// Parameters:
-//   - dtid: Destination Transaction ID, size from 1 to 4 bytes in BigEndian format.
-//   - dialogueObject: A pointer to a DialogueTCAP object, representing the dialogue to include in the message.
-//     If nil, no dialogue will be included in the message.
-func NewEndReturnResultLastWithDialogueObject(dtid []byte, invID int, opCode *uint8, payload []byte, dialogueObject *DialogueTCAP) *TCAP {
-	tcTcap := &TCAP{}
-	tcTcap.End = &EndTCAP{}
-	tcTcap.End.Components = &ComponentTCAP{}
-	tcTcap.End.Components.ReturnResultLast = &ReturnResultTCAP{}
-
-	tcTcap.End.Dtid = dtid
-	tcTcap.End.Components.ReturnResultLast.InvokeID = invID
-	tcTcap.End.Components.ReturnResultLast.OpCode = opCode
-	tcTcap.End.Components.ReturnResultLast.Parameter = payload
-	// Assign the dialogueObject to the Dialogue field. If dialogueObject is nil, no dialogue will be included.
-	tcTcap.End.Dialogue = dialogueObject
-
-	return tcTcap
 }
 
 // NewContinue create a Continue tcap message

@@ -143,7 +143,7 @@ func TestValidateInvokeID(t *testing.T) {
 	}
 }
 
-func TestNewBeginSafe(t *testing.T) {
+func TestNewBegin(t *testing.T) {
 	tests := []struct {
 		name        string
 		otid        []byte
@@ -192,7 +192,7 @@ func TestNewBeginSafe(t *testing.T) {
 	}
 }
 
-func TestNewBeginInvokeSafe(t *testing.T) {
+func TestNewBeginInvoke(t *testing.T) {
 	tests := []struct {
 		name        string
 		otid        []byte
@@ -232,7 +232,7 @@ func TestNewBeginInvokeSafe(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			tcap, err := NewBeginInvoke(tc.otid, tc.invID, tc.opCode, tc.payload)
+			tcap, err := NewBegin(tc.otid, WithBeginInvoke(tc.invID, tc.opCode, tc.payload))
 			if tc.expectError {
 				if err == nil {
 					t.Errorf("expected error but got none")
@@ -258,7 +258,7 @@ func TestNewBeginInvokeSafe(t *testing.T) {
 	}
 }
 
-func TestNewContinueSafe(t *testing.T) {
+func TestNewContinue(t *testing.T) {
 	tests := []struct {
 		name        string
 		otid        []byte
