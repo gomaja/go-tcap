@@ -71,7 +71,7 @@ type ABRTapduTCAP struct {
 	UserInformation []byte
 }
 
-// ComponentTCAP will have only one field fulfilled, and the others will be nil, except MoreComponents may exist additionally to any other field
+// ComponentTCAP will have only one field fulfilled and the others will be nil, except MoreComponents may exist additionally to any other field
 type ComponentTCAP struct { // choice Invoke, ReturnResultLast, ReturnError, Reject, ReturnResultNotLast
 	Invoke              *InvokeTCAP
 	ReturnResultLast    *ReturnResultTCAP
@@ -79,7 +79,7 @@ type ComponentTCAP struct { // choice Invoke, ReturnResultLast, ReturnError, Rej
 	Reject              *RejectTCAP
 	ReturnResultNotLast *ReturnResultTCAP
 
-	// Linked list here to include the presence of more than one component
+	// Linked list here to include presence of more than one component
 	MoreComponents *ComponentTCAP
 }
 
