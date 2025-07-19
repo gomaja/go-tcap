@@ -107,7 +107,7 @@ func convertAbortTCAPToAbort(ab *AbortTCAP) asn1tcapmodel.Abort {
 	if ab.PAbortCause != nil {
 		result.PAbortCause = int(*ab.PAbortCause)
 	} else {
-		result.PAbortCause = 255 // Default value to omit field
+		result.PAbortCause = FieldOmissionValue // Default value to omit field
 	}
 
 	if ab.UAbortCause != nil {
@@ -168,7 +168,7 @@ func convertInvokeTCAPToInvoke(inv *InvokeTCAP) asn1tcapmodel.Invoke {
 	if inv.LinkedID != nil {
 		result.LinkedID = int(*inv.LinkedID)
 	} else {
-		result.LinkedID = 255 // Default value to omit field
+		result.LinkedID = FieldOmissionValue // Default value to omit field
 	}
 	result.OpCode = int(inv.OpCode)
 	if inv.Parameter != nil {
@@ -226,22 +226,22 @@ func convertRejectTCAPToReject(rj *RejectTCAP) asn1tcapmodel.Reject {
 	if rj.GeneralProblem != nil {
 		result.GeneralProblem = int(*rj.GeneralProblem)
 	} else {
-		result.GeneralProblem = 255
+		result.GeneralProblem = FieldOmissionValue
 	}
 	if rj.InvokeProblem != nil {
 		result.InvokeProblem = int(*rj.InvokeProblem)
 	} else {
-		result.InvokeProblem = 255
+		result.InvokeProblem = FieldOmissionValue
 	}
 	if rj.ReturnResultProblem != nil {
 		result.ReturnResultProblem = int(*rj.ReturnResultProblem)
 	} else {
-		result.ReturnResultProblem = 255
+		result.ReturnResultProblem = FieldOmissionValue
 	}
 	if rj.ReturnErrorProblem != nil {
 		result.ReturnErrorProblem = int(*rj.ReturnErrorProblem)
 	} else {
-		result.ReturnErrorProblem = 255
+		result.ReturnErrorProblem = FieldOmissionValue
 	}
 
 	return result
@@ -263,7 +263,7 @@ func convertDialogueTCAPToDialoguePortion(dp *DialogueTCAP) asn1tcapmodel.Dialog
 	}
 
 	bytes, _ := asn1.Marshal(diagAll)
-	bytes[0] = 0x28 // overwrite "sequence constructor" tag to the "external constructor" tag
+	bytes[0] = ExternalConstructorTag // overwrite "sequence constructor" tag to the "external constructor" tag
 	return asn1tcapmodel.DialoguePortion{
 		Data: asn1.RawValue{FullBytes: bytes},
 	}
@@ -284,7 +284,7 @@ func convertAARQapduTCAPToAARQapdu(aarq *AARQapduTCAP) asn1tcapmodel.AARQapdu {
 	}
 
 	if aarq.UserInformation != nil {
-		aarq.UserInformation[0] = 0x28 // overwrite "sequence constructor" tag to the "external constructor" tag
+		aarq.UserInformation[0] = ExternalConstructorTag // overwrite "sequence constructor" tag to the "external constructor" tag
 		result.UserInformation = asn1tcapmodel.UserInformation{
 			Data: asn1.RawValue{FullBytes: aarq.UserInformation},
 		}
@@ -312,19 +312,19 @@ func convertAAREapduTCAPToAAREapdu(aare *AAREapduTCAP) asn1tcapmodel.AAREapdu {
 	if aare.ResultSourceDiagnostic.DialogueServiceUser != nil {
 		result.ResultSourceDiagnostic = asn1tcapmodel.AssociateSourceDiagnostic{
 			DialogueServiceUser:     int(*aare.ResultSourceDiagnostic.DialogueServiceUser),
-			DialogueServiceProvider: 255, // omit the field with this default number (magic number used in asn1 structs)
+			DialogueServiceProvider: FieldOmissionValue, // omit the field with this default number (magic number used in asn1 structs)
 		}
 	}
 
 	if aare.ResultSourceDiagnostic.DialogueServiceProvider != nil {
 		result.ResultSourceDiagnostic = asn1tcapmodel.AssociateSourceDiagnostic{
-			DialogueServiceUser:     255, // omit the field with this default number (magic number used in asn1 structs)
+			DialogueServiceUser:     FieldOmissionValue, // omit the field with this default number (magic number used in asn1 structs)
 			DialogueServiceProvider: int(*aare.ResultSourceDiagnostic.DialogueServiceProvider),
 		}
 	}
 
 	if aare.UserInformation != nil {
-		aare.UserInformation[0] = 0x28 // overwrite the "sequence constructor" tag to the "external constructor" tag
+		aare.UserInformation[0] = ExternalConstructorTag // overwrite the "sequence constructor" tag to the "external constructor" tag
 		result.UserInformation = asn1tcapmodel.UserInformation{
 			Data: asn1.RawValue{FullBytes: aare.UserInformation},
 		}
@@ -339,7 +339,7 @@ func convertABRTapduTCAPToABRTapdu(abrt *ABRTapduTCAP) asn1tcapmodel.ABRTapdu {
 	result.AbortSource = int(abrt.AbortSource)
 
 	if abrt.UserInformation != nil {
-		abrt.UserInformation[0] = 0x28 // overwrite "sequence constructor" tag to the "external constructor" tag
+		abrt.UserInformation[0] = ExternalConstructorTag // overwrite "sequence constructor" tag to the "external constructor" tag
 		result.UserInformation = asn1tcapmodel.UserInformation{
 			Data: asn1.RawValue{FullBytes: abrt.UserInformation},
 		}

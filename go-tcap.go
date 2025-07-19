@@ -128,8 +128,8 @@ func NewBeginWithDialogue(otid []byte, acn *int, acnVersion *int) *TCAP {
 		tcTcap.Begin.Dialogue = &DialogueTCAP{}
 		tcTcap.Begin.Dialogue.DialogueRequest = &AARQapduTCAP{}
 
-		tcTcap.Begin.Dialogue.DialogAsId = []int{0, 0, 17, 773, 1, 1, 1}
-		tcTcap.Begin.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(128) // protocol version 128 = 0x80
+		tcTcap.Begin.Dialogue.DialogAsId = DefaultDialogueAsId
+		tcTcap.Begin.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
 		tcTcap.Begin.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, *acn, *acnVersion}
 	}
 
@@ -165,8 +165,8 @@ func NewBeginInvokeWithDialogue(otid []byte, invID int, opCode uint8, payload []
 		tcTcap.Begin.Dialogue = &DialogueTCAP{}
 		tcTcap.Begin.Dialogue.DialogueRequest = &AARQapduTCAP{}
 
-		tcTcap.Begin.Dialogue.DialogAsId = []int{0, 0, 17, 773, 1, 1, 1}
-		tcTcap.Begin.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(128) // protocol version 128 = 0x80
+		tcTcap.Begin.Dialogue.DialogAsId = DefaultDialogueAsId
+		tcTcap.Begin.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
 		tcTcap.Begin.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, *acn, *acnVersion}
 	}
 
@@ -202,8 +202,8 @@ func NewEndReturnResultLastWithDialogue(dtid []byte, invID int, opCode *uint8, p
 		tcTcap.End.Dialogue = &DialogueTCAP{}
 		tcTcap.End.Dialogue.DialogueRequest = &AARQapduTCAP{}
 
-		tcTcap.End.Dialogue.DialogAsId = []int{0, 0, 17, 773, 1, 1, 1}
-		tcTcap.End.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(128) // protocol version 128 = 0x80
+		tcTcap.End.Dialogue.DialogAsId = DefaultDialogueAsId
+		tcTcap.End.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
 		tcTcap.End.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, *acn, *acnVersion}
 	}
 
@@ -256,8 +256,8 @@ func NewContinueWithDialogue(otid []byte, dtid []byte, acn *int, acnVersion *int
 		tcTcap.Continue.Dialogue = &DialogueTCAP{}
 		tcTcap.Continue.Dialogue.DialogueRequest = &AARQapduTCAP{}
 
-		tcTcap.Continue.Dialogue.DialogAsId = []int{0, 0, 17, 773, 1, 1, 1}
-		tcTcap.Continue.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(128) // protocol version 128 = 0x80
+		tcTcap.Continue.Dialogue.DialogAsId = DefaultDialogueAsId
+		tcTcap.Continue.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
 		tcTcap.Continue.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, *acn, *acnVersion}
 	}
 
@@ -315,8 +315,8 @@ func NewContinueInvokeWithDialogue(otid, dtid []byte, invID int, opCode uint8, p
 		tcTcap.Continue.Dialogue = &DialogueTCAP{}
 		tcTcap.Continue.Dialogue.DialogueRequest = &AARQapduTCAP{}
 
-		tcTcap.Continue.Dialogue.DialogAsId = []int{0, 0, 17, 773, 1, 1, 1}
-		tcTcap.Continue.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(128) // protocol version 128 = 0x80
+		tcTcap.Continue.Dialogue.DialogAsId = DefaultDialogueAsId
+		tcTcap.Continue.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
 		tcTcap.Continue.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, *acn, *acnVersion}
 	}
 
@@ -349,8 +349,8 @@ func NewContinueReturnResultLastWithDialogue(otid, dtid []byte, invID int, opCod
 		tcTcap.Continue.Dialogue = &DialogueTCAP{}
 		tcTcap.Continue.Dialogue.DialogueRequest = &AARQapduTCAP{}
 
-		tcTcap.Continue.Dialogue.DialogAsId = []int{0, 0, 17, 773, 1, 1, 1}
-		tcTcap.Continue.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(128) // protocol version 128 = 0x80
+		tcTcap.Continue.Dialogue.DialogAsId = DefaultDialogueAsId
+		tcTcap.Continue.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
 		tcTcap.Continue.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, *acn, *acnVersion}
 	}
 
@@ -383,8 +383,10 @@ func NewContinueReturnResultLastWithDialogueObject(otid, dtid []byte, invID int,
 // validateTransactionID validates that a transaction ID meets ITU-T Q.773 requirements
 // Transaction ID must be 1 to 4 bytes in length
 func validateTransactionID(tid []byte, fieldName string) error {
-	if len(tid) < 1 || len(tid) > 4 {
-		return fmt.Errorf("%s must be 1 to 4 bytes in length, got %d bytes", fieldName, len(tid))
+	if len(tid) < MinTransactionIDLength || len(tid) > MaxTransactionIDLength {
+		return newValidationError(fieldName, len(tid),
+			fmt.Errorf("must be %d to %d bytes in length, got %d bytes",
+				MinTransactionIDLength, MaxTransactionIDLength, len(tid)))
 	}
 	return nil
 }
@@ -392,8 +394,10 @@ func validateTransactionID(tid []byte, fieldName string) error {
 // validateInvokeID validates that an invoke ID is within the valid range
 // Invoke ID must be in range -128 to 127 (signed 8-bit integer)
 func validateInvokeID(invID int, fieldName string) error {
-	if invID < -128 || invID > 127 {
-		return fmt.Errorf("%s must be in range -128 to 127, got %d", fieldName, invID)
+	if invID < MinInvokeID || invID > MaxInvokeID {
+		return newValidationError(fieldName, invID,
+			fmt.Errorf("must be in range %d to %d, got %d",
+				MinInvokeID, MaxInvokeID, invID))
 	}
 	return nil
 }

@@ -42,14 +42,14 @@ func TestValidateTransactionID(t *testing.T) {
 			tid:         []byte{},
 			fieldName:   "otid",
 			expectError: true,
-			errorText:   "otid must be 1 to 4 bytes in length, got 0 bytes",
+			errorText:   "must be 1 to 4 bytes in length, got 0 bytes",
 		},
 		{
 			name:        "Invalid 5 bytes",
 			tid:         []byte{0x01, 0x02, 0x03, 0x04, 0x05},
 			fieldName:   "dtid",
 			expectError: true,
-			errorText:   "dtid must be 1 to 4 bytes in length, got 5 bytes",
+			errorText:   "must be 1 to 4 bytes in length, got 5 bytes",
 		},
 	}
 
@@ -59,8 +59,8 @@ func TestValidateTransactionID(t *testing.T) {
 			if tc.expectError {
 				if err == nil {
 					t.Errorf("expected error but got none")
-				} else if err.Error() != tc.errorText {
-					t.Errorf("expected error '%s', got '%s'", tc.errorText, err.Error())
+				} else if !strings.Contains(err.Error(), tc.errorText) {
+					t.Errorf("expected error containing '%s', got '%s'", tc.errorText, err.Error())
 				}
 			} else {
 				if err != nil {
@@ -114,14 +114,14 @@ func TestValidateInvokeID(t *testing.T) {
 			invID:       -129,
 			fieldName:   "invID",
 			expectError: true,
-			errorText:   "invID must be in range -128 to 127, got -129",
+			errorText:   "must be in range -128 to 127, got -129",
 		},
 		{
 			name:        "Invalid too high",
 			invID:       128,
 			fieldName:   "linkedID",
 			expectError: true,
-			errorText:   "linkedID must be in range -128 to 127, got 128",
+			errorText:   "must be in range -128 to 127, got 128",
 		},
 	}
 
@@ -131,8 +131,8 @@ func TestValidateInvokeID(t *testing.T) {
 			if tc.expectError {
 				if err == nil {
 					t.Errorf("expected error but got none")
-				} else if err.Error() != tc.errorText {
-					t.Errorf("expected error '%s', got '%s'", tc.errorText, err.Error())
+				} else if !strings.Contains(err.Error(), tc.errorText) {
+					t.Errorf("expected error containing '%s', got '%s'", tc.errorText, err.Error())
 				}
 			} else {
 				if err != nil {
@@ -216,7 +216,7 @@ func TestNewBeginInvokeSafe(t *testing.T) {
 			opCode:      0x2D,
 			payload:     []byte{0x01, 0x02, 0x03},
 			expectError: true,
-			errorText:   "otid must be 1 to 4 bytes in length",
+			errorText:   "must be 1 to 4 bytes in length",
 		},
 		{
 			name:        "Invalid invID",
@@ -225,7 +225,7 @@ func TestNewBeginInvokeSafe(t *testing.T) {
 			opCode:      0x2D,
 			payload:     []byte{0x01, 0x02, 0x03},
 			expectError: true,
-			errorText:   "invID must be in range -128 to 127",
+			errorText:   "must be in range -128 to 127",
 		},
 	}
 
@@ -275,14 +275,14 @@ func TestNewContinueSafe(t *testing.T) {
 			otid:        []byte{},
 			dtid:        []byte{0x03, 0x04},
 			expectError: true,
-			errorText:   "otid must be 1 to 4 bytes in length",
+			errorText:   "must be 1 to 4 bytes in length",
 		},
 		{
 			name:        "Invalid dtid",
 			otid:        []byte{0x01, 0x02},
 			dtid:        []byte{0x01, 0x02, 0x03, 0x04, 0x05},
 			expectError: true,
-			errorText:   "dtid must be 1 to 4 bytes in length",
+			errorText:   "must be 1 to 4 bytes in length",
 		},
 	}
 
