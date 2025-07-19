@@ -182,6 +182,7 @@ func TestNewBeginSafe(t *testing.T) {
 				}
 				if tcap == nil {
 					t.Errorf("expected valid TCAP")
+					return
 				}
 				if tcap.Begin == nil {
 					t.Errorf("expected Begin field to be set")
@@ -247,6 +248,7 @@ func TestNewBeginInvokeSafe(t *testing.T) {
 				}
 				if tcap == nil {
 					t.Errorf("expected valid TCAP")
+					return
 				}
 				if tcap.Begin == nil || tcap.Begin.Components == nil || tcap.Begin.Components.Invoke == nil {
 					t.Errorf("expected Begin Invoke to be properly set")
@@ -304,6 +306,7 @@ func TestNewContinueSafe(t *testing.T) {
 				}
 				if tcap == nil {
 					t.Errorf("expected valid TCAP")
+					return
 				}
 				if tcap.Continue == nil {
 					t.Errorf("expected Continue field to be set")
