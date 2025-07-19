@@ -1,5 +1,7 @@
 package tcap
 
+import "fmt"
+
 // TCAP will have only one field fulfilled and the others will be nil
 type TCAP struct { // choice
 	Unidirectional *UnidirectionalTCAP
@@ -107,8 +109,11 @@ type RejectTCAP struct {
 
 // NewBegin create a Begin tcap message
 // otid size from 1 to 4 bytes in BigEndian format
-func NewBegin(otid []byte) *TCAP {
-	return NewBeginWithDialogue(otid, nil, nil)
+func NewBegin(otid []byte) (*TCAP, error) {
+	if err := validateTransactionID(otid, "otid"); err != nil {
+		return nil, err
+	}
+	return NewBeginWithDialogue(otid, nil, nil), nil
 }
 
 // NewBeginWithDialogue create a Begin tcap message with a dialogue
@@ -133,8 +138,14 @@ func NewBeginWithDialogue(otid []byte, acn *int, acnVersion *int) *TCAP {
 
 // NewBeginInvoke create a Begin Invoke tcap message
 // otid size from 1 to 4 bytes in BigEndian format
-func NewBeginInvoke(otid []byte, invID int, opCode uint8, payload []byte) *TCAP {
-	return NewBeginInvokeWithDialogue(otid, invID, opCode, payload, nil, nil)
+func NewBeginInvoke(otid []byte, invID int, opCode uint8, payload []byte) (*TCAP, error) {
+	if err := validateTransactionID(otid, "otid"); err != nil {
+		return nil, err
+	}
+	if err := validateInvokeID(invID, "invID"); err != nil {
+		return nil, err
+	}
+	return NewBeginInvokeWithDialogue(otid, invID, opCode, payload, nil, nil), nil
 }
 
 // NewBeginInvokeWithDialogue create a Begin Invoke tcap message with a dialogue
@@ -164,8 +175,14 @@ func NewBeginInvokeWithDialogue(otid []byte, invID int, opCode uint8, payload []
 
 // NewEndReturnResultLast create an End ReturnResultLast tcap message
 // dtid size from 1 to 4 bytes in BigEndian format
-func NewEndReturnResultLast(dtid []byte, invID int, opCode *uint8, payload []byte) *TCAP {
-	return NewEndReturnResultLastWithDialogue(dtid, invID, opCode, payload, nil, nil)
+func NewEndReturnResultLast(dtid []byte, invID int, opCode *uint8, payload []byte) (*TCAP, error) {
+	if err := validateTransactionID(dtid, "dtid"); err != nil {
+		return nil, err
+	}
+	if err := validateInvokeID(invID, "invID"); err != nil {
+		return nil, err
+	}
+	return NewEndReturnResultLastWithDialogue(dtid, invID, opCode, payload, nil, nil), nil
 }
 
 // NewEndReturnResultLastWithDialogue create an End ReturnResultLast tcap message with a dialogue
@@ -216,8 +233,14 @@ func NewEndReturnResultLastWithDialogueObject(dtid []byte, invID int, opCode *ui
 
 // NewContinue create a Continue tcap message
 // otid and dtid size from 1 to 4 bytes in BigEndian format
-func NewContinue(otid []byte, dtid []byte) *TCAP {
-	return NewContinueWithDialogue(otid, dtid, nil, nil)
+func NewContinue(otid []byte, dtid []byte) (*TCAP, error) {
+	if err := validateTransactionID(otid, "otid"); err != nil {
+		return nil, err
+	}
+	if err := validateTransactionID(dtid, "dtid"); err != nil {
+		return nil, err
+	}
+	return NewContinueWithDialogue(otid, dtid, nil, nil), nil
 }
 
 // NewContinueWithDialogue create a Continue tcap message with a dialogue
@@ -261,8 +284,17 @@ func NewContinueWithDialogueObject(otid []byte, dtid []byte, dialogueObject *Dia
 
 // NewContinueInvoke create a Continue Invoke tcap message
 // otid and dtid size from 1 to 4 bytes in BigEndian format
-func NewContinueInvoke(otid []byte, dtid []byte, invID int, opCode uint8, payload []byte) *TCAP {
-	return NewContinueInvokeWithDialogue(otid, dtid, invID, opCode, payload, nil, nil)
+func NewContinueInvoke(otid []byte, dtid []byte, invID int, opCode uint8, payload []byte) (*TCAP, error) {
+	if err := validateTransactionID(otid, "otid"); err != nil {
+		return nil, err
+	}
+	if err := validateTransactionID(dtid, "dtid"); err != nil {
+		return nil, err
+	}
+	if err := validateInvokeID(invID, "invID"); err != nil {
+		return nil, err
+	}
+	return NewContinueInvokeWithDialogue(otid, dtid, invID, opCode, payload, nil, nil), nil
 }
 
 // NewContinueInvokeWithDialogue create a Continue Invoke tcap message with a dialogue
@@ -346,4 +378,22 @@ func NewContinueReturnResultLastWithDialogueObject(otid, dtid []byte, invID int,
 	tcTcap.Continue.Dialogue = dialogueObject
 
 	return tcTcap
+}
+
+// validateTransactionID validates that a transaction ID meets ITU-T Q.773 requirements
+// Transaction ID must be 1 to 4 bytes in length
+func validateTransactionID(tid []byte, fieldName string) error {
+	if len(tid) < 1 || len(tid) > 4 {
+		return fmt.Errorf("%s must be 1 to 4 bytes in length, got %d bytes", fieldName, len(tid))
+	}
+	return nil
+}
+
+// validateInvokeID validates that an invoke ID is within the valid range
+// Invoke ID must be in range -128 to 127 (signed 8-bit integer)
+func validateInvokeID(invID int, fieldName string) error {
+	if invID < -128 || invID > 127 {
+		return fmt.Errorf("%s must be in range -128 to 127, got %d", fieldName, invID)
+	}
+	return nil
 }
