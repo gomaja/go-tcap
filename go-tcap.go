@@ -195,7 +195,7 @@ func NewEndReturnResultLastWithDialogue(dtid []byte, invID int, opCode *uint8, p
 
 // NewEndReturnResultLastWithDialogueObject create an End ReturnResultLast tcap message with a dialogue object
 // Parameters:
-//   - otid: Originating Transaction ID, size from 1 to 4 bytes in BigEndian format.
+//   - dtid: Destination Transaction ID, size from 1 to 4 bytes in BigEndian format.
 //   - dialogueObject: A pointer to a DialogueTCAP object, representing the dialogue to include in the message.
 //     If nil, no dialogue will be included in the message.
 func NewEndReturnResultLastWithDialogueObject(dtid []byte, invID int, opCode *uint8, payload []byte, dialogueObject *DialogueTCAP) *TCAP {
