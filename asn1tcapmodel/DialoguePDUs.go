@@ -74,10 +74,10 @@ const (
 )
 
 type AssociateSourceDiagnostic struct { // choice
-	// AssociateSourceDiagUserInt
+	// AssociateSourceDiagUserInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 (FieldOmissionValue) is used to check if the field arrived was empty
 	DialogueServiceUser int `asn1:"default:255,tag:1,explicit,optional"`
 
-	// AssociateSourceDiagProviderInt
+	// AssociateSourceDiagProviderInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 (FieldOmissionValue) is used to check if the field arrived was empty
 	DialogueServiceProvider int `asn1:"default:255,tag:2,explicit,optional"`
 }
 

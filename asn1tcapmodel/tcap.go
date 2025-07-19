@@ -40,7 +40,7 @@ type Continue struct {
 type Abort struct {
 	Dtid TransactionID `asn1:"application,tag:9"`
 
-	// PAbortCauseInt // default:255 will change omitting the optional field to the value 255 instead of 0, the 255 is used to check if the field arrived was empty
+	// PAbortCauseInt // default:255 will change omitting the optional field to the value 255 instead of 0, the 255 (FieldOmissionValue) is used to check if the field arrived was empty
 	PAbortCause int `asn1:"default:255,application,tag:10,optional"` // [APPLICATION 10] = 0x2a = 42 dec
 
 	UAbortCause DialoguePortion `asn1:"application,tag:11,optional"` // [APPLICATION 11]
@@ -97,7 +97,7 @@ type Invoke struct {
 	// InvokeIDInt // integer value range -128 to 127
 	InvokeID int // InvokeID InvokeIDInt starts at 0, and may increment to 1, 2, ... for long SMS
 
-	// LinkedIDInt // default:255 will change omitting the optional field to the value 255 instead of 0, the 255 is used to check if the field arrived was empty
+	// LinkedIDInt // default:255 will change omitting the optional field to the value 255 instead of 0, the 255 (FieldOmissionValue) is used to check if the field arrived was empty
 	LinkedID int `asn1:"default:255,tag:0,optional"` // [ContextSpecific 0]
 
 	// OpCodeInt
@@ -140,13 +140,13 @@ type Reject struct {
 	DerivableOrNotDerivable asn1.RawValue // fill it here and verify if Derivable or NotDerivable after
 
 	//RejectProblem // choice
-	// GeneralProblemInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 is used to check if the field arrived was empty
+	// GeneralProblemInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 (FieldOmissionValue) is used to check if the field arrived was empty
 	GeneralProblem int `asn1:"default:255,tag:0,optional"`
-	// InvokeProblemInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 is used to check if the field arrived was empty
+	// InvokeProblemInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 (FieldOmissionValue) is used to check if the field arrived was empty
 	InvokeProblem int `asn1:"default:255,tag:1,optional"`
-	// ReturnResultProblemInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 is used to check if the field arrived was empty
+	// ReturnResultProblemInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 (FieldOmissionValue) is used to check if the field arrived was empty
 	ReturnResultProblem int `asn1:"default:255,tag:2,optional"`
-	// ReturnErrorProblemInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 is used to check if the field arrived was empty
+	// ReturnErrorProblemInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 (FieldOmissionValue) is used to check if the field arrived was empty
 	ReturnErrorProblem int `asn1:"default:255,tag:3,optional"`
 }
 

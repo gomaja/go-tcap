@@ -7,7 +7,7 @@ import (
 	"github.com/gomaja/go-tcap/asn1tcapmodel"
 )
 
-// care for int optional fields in asn1 structs, to omit a field, its value should be = 255
+// care for int optional fields in asn1 structs, to omit a field, its value should be = 255 (FieldOmissionValue)
 
 func (tcTcap *TCAP) Marshal() ([]byte, error) {
 	var asn1Tcap asn1tcapmodel.TCMessage
