@@ -2,9 +2,9 @@ package tcap
 
 import (
 	"encoding/asn1"
+	"errors"
 	"fmt"
 	"reflect"
-	"strings"
 
 	"github.com/gomaja/go-tcap/asn1tcapmodel"
 	"github.com/gomaja/go-tcap/utils"
@@ -18,11 +18,11 @@ func uint8Ptr(i int) *uint8 {
 func ParseAny(b []byte) (*TCAP, error) {
 	// Parse first with ParseDER and check for error
 	tcap, err := ParseDER(b)
-	if err != nil && strings.Contains(err.Error(), "indefinite length found (not DER)") {
+	if err != nil && errors.Is(err, ErrIndefiniteLength) {
 		// If ParseDER showed an error due to indefinite-length type (not DER), then convert to DER
 		derBytes, err := utils.MakeDER(b) // bytes will remain the same if the provided bytes are already DER, otherwise they are converted to from non-DER (indefinite length) to DER
 		if err != nil {
-			return nil, err
+			return nil, newParseError("ParseAny", "MakeDER", err)
 		}
 
 		fmt.Println("Detected a non-DER (indefinite length)")
@@ -37,7 +37,7 @@ func ParseAny(b []byte) (*TCAP, error) {
 // It parses on DER encoded asn1 structs, the encoding/asn1 package parses on DER (indefinite length is not supported)
 func ParseDER(b []byte) (*TCAP, error) {
 	if len(b) == 0 {
-		return nil, fmt.Errorf("invalid input data")
+		return nil, ErrEmptyData
 	}
 
 	// Length have a special treatment, either we can write a custom function to treat short form and long form of lengths as per ITU-T Q.773 (06/97) page 10,
@@ -47,13 +47,13 @@ func ParseDER(b []byte) (*TCAP, error) {
 	// marshal for proper length (short form or long form) and tag treatment (to add struct tag)
 	b, err := asn1.Marshal(newByteString)
 	if err != nil {
-		return nil, err
+		return nil, newParseError("ParseDER", "Marshal", err)
 	}
 
 	var asn1Tcap asn1tcapmodel.TCMessage
 	_, err = asn1.Unmarshal(b, &asn1Tcap)
 	if err != nil {
-		return nil, err
+		return nil, newParseError("ParseDER", "Unmarshal", err)
 	}
 
 	return convertTCMessageToTCAP(&asn1Tcap), nil
@@ -177,7 +177,7 @@ func convertAbortToAbortTCAP(abrt *asn1tcapmodel.Abort) *AbortTCAP {
 	abrtTcap.Dtid = TransactionID(abrt.Dtid)
 
 	// fill PAbortCause
-	if abrt.PAbortCause != 255 { // checks and fulfills optional field
+	if abrt.PAbortCause != FieldOmissionValue { // checks and fulfills optional field
 		abrtTcap.PAbortCause = uint8Ptr(int(abrt.PAbortCause))
 	}
 
@@ -275,7 +275,7 @@ func convertInvokeToInvokeTCAP(invk *asn1tcapmodel.Invoke) *InvokeTCAP {
 
 	invokeTcap.InvokeID = invk.InvokeID
 
-	if invk.LinkedID != 255 { // check optional field if empty
+	if invk.LinkedID != FieldOmissionValue { // check optional field if empty
 		invokeTcap.LinkedID = &invk.LinkedID
 	}
 
@@ -326,19 +326,19 @@ func convertRejectToRejectTCAP(rj *asn1tcapmodel.Reject) *RejectTCAP {
 		rjTcap.DerivableOrNotDerivable = nil
 	}
 
-	if rj.GeneralProblem != 255 { // check optional field if empty
+	if rj.GeneralProblem != FieldOmissionValue { // check optional field if empty
 		rjTcap.GeneralProblem = uint8Ptr(int(rj.GeneralProblem))
 	}
 
-	if rj.InvokeProblem != 255 { // check optional field if empty
+	if rj.InvokeProblem != FieldOmissionValue { // check optional field if empty
 		rjTcap.InvokeProblem = uint8Ptr(int(rj.InvokeProblem))
 	}
 
-	if rj.ReturnResultProblem != 255 { // check optional field if empty
+	if rj.ReturnResultProblem != FieldOmissionValue { // check optional field if empty
 		rjTcap.ReturnResultProblem = uint8Ptr(int(rj.ReturnResultProblem))
 	}
 
-	if rj.ReturnErrorProblem != 255 { // check optional field if empty
+	if rj.ReturnErrorProblem != FieldOmissionValue { // check optional field if empty
 		rjTcap.ReturnErrorProblem = uint8Ptr(int(rj.ReturnErrorProblem))
 	}
 
@@ -352,7 +352,7 @@ func convertDialoguePortionToDialogueTCAP(dp *asn1tcapmodel.DialoguePortion) *Di
 	var DiagAll asn1tcapmodel.DialogueAll
 	// modify the tag to a SEQUENCE tag with constructor type (the ASN1 library in go works like this, SEQUENCE tag should be for structs with constructor type)
 	DiagAllBytes := dp.Data.FullBytes
-	DiagAllBytes[0] = 0x30 // overwrite the EXTERNAL tag (EXTERNAL Constructor) to the known struct tag for asn1 // 00110000 (Sequence and constructor)
+	DiagAllBytes[0] = SequenceConstructorTag // overwrite the EXTERNAL tag (EXTERNAL Constructor) to the known struct tag for asn1
 	_, _ = asn1.Unmarshal(DiagAllBytes, &DiagAll)
 
 	if !reflect.ValueOf(DiagAll.DialogueAsId).IsZero() { // check optional field if empty
@@ -408,10 +408,10 @@ func convertAAREapduToAAREapduTCAP(aare *asn1tcapmodel.AAREapdu) *AAREapduTCAP {
 	aareTcap.Result = uint8(aare.Result.Data)
 
 	// ResultSourceDiagnostic // choice
-	if aare.ResultSourceDiagnostic.DialogueServiceUser != 255 { // check optional field if empty
+	if aare.ResultSourceDiagnostic.DialogueServiceUser != FieldOmissionValue { // check optional field if empty
 		aareTcap.ResultSourceDiagnostic.DialogueServiceUser = uint8Ptr(int(aare.ResultSourceDiagnostic.DialogueServiceUser))
 	}
-	if aare.ResultSourceDiagnostic.DialogueServiceProvider != 255 { // check optional field if empty
+	if aare.ResultSourceDiagnostic.DialogueServiceProvider != FieldOmissionValue { // check optional field if empty
 		aareTcap.ResultSourceDiagnostic.DialogueServiceProvider = uint8Ptr(int(aare.ResultSourceDiagnostic.DialogueServiceProvider))
 	}
 
