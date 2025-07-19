@@ -2,6 +2,7 @@ package tcap
 
 import (
 	"encoding/asn1"
+	"encoding/binary"
 
 	"github.com/gomaja/go-tcap/asn1tcapmodel"
 )
@@ -345,4 +346,27 @@ func convertABRTapduTCAPToABRTapdu(abrt *ABRTapduTCAP) asn1tcapmodel.ABRTapdu {
 	}
 
 	return result
+}
+
+// uint32ToBytes converts a Go uint to a big-endian byte slice,
+// omitting all left (most significant) zero bytes except when the value is zero.
+func uint32ToBytes(u uint32) []byte {
+	// Special case: if u == 0, return a single zero byte
+	if u == 0 {
+		return []byte{0}
+	}
+
+	// Convert to uint32 for consistent 4-byte handling,
+	// then serialize in BigEndian.
+	var buf [4]byte
+	binary.BigEndian.PutUint32(buf[:], u)
+
+	// Find the first non-zero byte
+	idx := 0
+	for idx < len(buf) && buf[idx] == 0 {
+		idx++
+	}
+
+	// Slice from the first non-zero byte to the end
+	return buf[idx:]
 }
