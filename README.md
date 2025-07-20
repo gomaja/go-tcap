@@ -21,80 +21,6 @@ The TCAP structures in this library are directly defined based on the ASN.1 defi
 go get github.com/gomaja/go-tcap
 ```
 
-## Usage
-
-### Parsing TCAP Messages
-
-```go
-package main
-
-import (
-    "encoding/hex"
-    "fmt"
-
-    "github.com/gomaja/go-tcap"
-)
-
-func main() {
-    // Example TCAP message in hex format
-    hexMsg := "62494804004734a86b1e281c060700118605010101a011600f80020780a1090607040000010014036c21a11f02010002012d3017800891328490507608f38101ff820891328490123009f1"
-
-    // Decode hex to bytes
-    tcapBytes, _ := hex.DecodeString(hexMsg)
-
-    // Parse TCAP message
-    tcapMsg, err := tcap.ParseDER(tcapBytes)
-    if err != nil {
-        fmt.Printf("Error parsing TCAP message: %v\n", err)
-        return
-    }
-
-    // Access TCAP message fields
-    if tcapMsg.Begin != nil {
-        fmt.Printf("Begin message with OTID: %x\n", tcapMsg.Begin.Otid)
-
-        if tcapMsg.Begin.Components != nil && tcapMsg.Begin.Components.Invoke != nil {
-            fmt.Printf("Invoke with ID: %d, OpCode: %d\n", 
-                tcapMsg.Begin.Components.Invoke.InvokeID,
-                tcapMsg.Begin.Components.Invoke.OpCode)
-        }
-    }
-}
-```
-
-### Creating TCAP Messages
-
-```go
-package main
-
-import (
-    "encoding/hex"
-    "fmt"
-
-    "github.com/gomaja/go-tcap"
-)
-
-func main() {
-    // Create a Begin message with Invoke component
-    otid := []byte{0x01, 0x02, 0x03, 0x04}
-    invokeID := 1
-    opCode := uint8(45) // Example operation code
-    payload := []byte{0x01, 0x02, 0x03} // Example payload
-
-    tcapMsg := tcap.NewBeginInvoke(otid, invokeID, opCode, payload)
-
-    // Marshal to binary
-    tcapBytes, err := tcapMsg.Marshal()
-    if err != nil {
-        fmt.Printf("Error marshaling TCAP message: %v\n", err)
-        return
-    }
-
-    // Print as hex
-    fmt.Printf("TCAP message: %x\n", tcapBytes)
-}
-```
-
 ## Features
 
 ### Transaction Portion
@@ -158,16 +84,6 @@ func main() {
 - `BeginTCAP`, `EndTCAP`, `ContinueTCAP`, `AbortTCAP`, `UnidirectionalTCAP`: Different TCAP message types
 - `ComponentTCAP`: Represents the component portion of a TCAP message
 - `DialogueTCAP`: Represents the dialogue portion of a TCAP message
-
-### Key Functions
-
-- `ParseAny([]byte) (*TCAP, error)`: Parse any TCAP message (DER or non-DER encoded)
-- `ParseDER([]byte) (*TCAP, error)`: Parse a DER-encoded TCAP message
-- `(TCAP).Marshal() ([]byte, error)`: Marshal a TCAP message to binary
-- `NewBegin([]byte) *TCAP`: Create a new Begin message
-- `NewBeginInvoke([]byte, int, uint8, []byte) *TCAP`: Create a new Begin message with Invoke component
-- `NewEndReturnResultLast([]byte, int, *uint8, []byte) *TCAP`: Create a new End message with ReturnResultLast component
-- `NewContinueInvoke([]byte, []byte, int, uint8, []byte) *TCAP`: Create a new Continue message with Invoke component
 
 ## Common Use Cases
 
