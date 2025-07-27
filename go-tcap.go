@@ -170,7 +170,11 @@ func newDialogueResponse(acn, acnVersion int) *DialogueTCAP {
 		DialogAsId: DefaultDialogueAsId,
 		DialogueResponse: &AAREapduTCAP{
 			ProtocolVersionPadded: uint8Ptr(DefaultProtocolVersion),
-			AcnVersion:            append(DefaultAcnPrefix, acn, acnVersion),
+			AcnVersion: func() []int {
+				acnCopy := make([]int, len(DefaultAcnPrefix)+2)
+				copy(acnCopy, DefaultAcnPrefix)
+				return append(acnCopy, acn, acnVersion)
+			}(),
 		},
 	}
 }
