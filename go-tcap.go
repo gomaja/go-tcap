@@ -12,7 +12,7 @@ const (
 	MessageTypeAbort          MessageType = "Abort"
 )
 
-// TCAP will have only one field fulfilled, and the others will be nil
+// TCAP represents a choice of TCAP message types such as Unidirectional, Begin, End, Continue, or Abort.
 type TCAP interface { // choice
 	Marshal() ([]byte, error)
 	MessageType() MessageType
