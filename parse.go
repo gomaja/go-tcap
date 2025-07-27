@@ -15,7 +15,7 @@ func uint8Ptr(i int) *uint8 {
 	return &u
 }
 
-func ParseAny(b []byte) (*TCAP, error) {
+func ParseAny(b []byte) (TCAP, error) {
 	// Parse first with ParseDER and check for error
 	tcap, err := ParseDER(b)
 	if err != nil && errors.Is(err, ErrIndefiniteLength) {
@@ -35,7 +35,7 @@ func ParseAny(b []byte) (*TCAP, error) {
 
 // ParseDER takes a slice of byte, without a tag and length. A tag byte and length byte are added at the beginning internally to satisfy asn1 Unmarshal behavior for completeness
 // It parses on DER encoded asn1 structs, the encoding/asn1 package parses on DER (indefinite length is not supported)
-func ParseDER(b []byte) (*TCAP, error) {
+func ParseDER(b []byte) (TCAP, error) {
 	if len(b) == 0 {
 		return nil, ErrEmptyData
 	}
@@ -59,7 +59,7 @@ func ParseDER(b []byte) (*TCAP, error) {
 	return convertTCMessageToTCAP(&asn1Tcap), nil
 }
 
-func convertTCMessageToTCAP(tcMessage *asn1tcapmodel.TCMessage) *TCAP {
+func convertTCMessageToTCAP(tcMessage *asn1tcapmodel.TCMessage) TCAP {
 	var tcTCAP TCAP
 
 	// CHOICE
@@ -67,32 +67,32 @@ func convertTCMessageToTCAP(tcMessage *asn1tcapmodel.TCMessage) *TCAP {
 
 	// check Unidirectional and fill tc
 	if !reflect.ValueOf(tcMessage.Unidirectional).IsZero() { // check if Unidirectional is not empty
-		tcTCAP.Unidirectional = convertUnidirectionalToUnidirectionalTCAP(&tcMessage.Unidirectional)
-		return &tcTCAP
+		tcTCAP = convertUnidirectionalToUnidirectionalTCAP(&tcMessage.Unidirectional)
+		return tcTCAP
 	}
 
 	// check Begin and fill tc
 	if !reflect.ValueOf(tcMessage.Begin).IsZero() { // check if Begin is not empty
-		tcTCAP.Begin = convertBeginToBeginTCAP(&tcMessage.Begin)
-		return &tcTCAP
+		tcTCAP = convertBeginToBeginTCAP(&tcMessage.Begin)
+		return tcTCAP
 	}
 
 	// check End and fill tc
 	if !reflect.ValueOf(tcMessage.End).IsZero() { // check if End is not empty
-		tcTCAP.End = convertEndToEndTCAP(&tcMessage.End)
-		return &tcTCAP
+		tcTCAP = convertEndToEndTCAP(&tcMessage.End)
+		return tcTCAP
 	}
 
 	// check Continue and fill tc
 	if !reflect.ValueOf(tcMessage.Continue).IsZero() { // check if Continue is not empty
-		tcTCAP.Continue = convertContinueToContinueTCAP(&tcMessage.Continue)
-		return &tcTCAP
+		tcTCAP = convertContinueToContinueTCAP(&tcMessage.Continue)
+		return tcTCAP
 	}
 
 	// check Abort and fill tc
 	if !reflect.ValueOf(tcMessage.Abort).IsZero() { // check if Abort is not empty
-		tcTCAP.Abort = convertAbortToAbortTCAP(&tcMessage.Abort)
-		return &tcTCAP
+		tcTCAP = convertAbortToAbortTCAP(&tcMessage.Abort)
+		return tcTCAP
 	}
 
 	return nil

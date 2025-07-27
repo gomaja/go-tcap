@@ -1,14 +1,24 @@
 package tcap
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
-// TCAP will have only one field fulfilled and the others will be nil
-type TCAP struct { // choice
-	Unidirectional *UnidirectionalTCAP
-	Begin          *BeginTCAP
-	End            *EndTCAP
-	Continue       *ContinueTCAP
-	Abort          *AbortTCAP
+type MessageType string
+
+const (
+	MessageTypeUnidirectional MessageType = "Unidirectional"
+	MessageTypeBegin          MessageType = "Begin"
+	MessageTypeEnd            MessageType = "End"
+	MessageTypeContinue       MessageType = "Continue"
+	MessageTypeAbort          MessageType = "Abort"
+)
+
+// TCAP represents a choice of TCAP message types such as Unidirectional, Begin, End, Continue, or Abort.
+type TCAP interface { // choice
+	Marshal() ([]byte, error)
+	MessageType() MessageType
 }
 
 type UnidirectionalTCAP struct {
@@ -107,6 +117,22 @@ type RejectTCAP struct {
 	ReturnErrorProblem      *uint8
 }
 
+func NewDialogueResponseFromDialogueRequest(dialogue *DialogueTCAP) (*DialogueTCAP, error) {
+	if dialogue == nil {
+		return nil, nil
+	}
+	if dialogue.DialogueRequest == nil {
+		return nil, errors.New("dialogue request is nil")
+	}
+	return &DialogueTCAP{
+		DialogAsId: dialogue.DialogAsId,
+		DialogueResponse: &AAREapduTCAP{
+			ProtocolVersionPadded: dialogue.DialogueRequest.ProtocolVersionPadded,
+			AcnVersion:            dialogue.DialogueRequest.AcnVersion,
+		},
+	}, nil
+}
+
 // validateTransactionID validates that a transaction ID meets ITU-T Q.773 requirements
 // Transaction ID must be 1 to 4 bytes in length
 func validateTransactionID(tid []byte, fieldName string) error {
@@ -127,4 +153,34 @@ func validateInvokeID(invID int, fieldName string) error {
 				MinInvokeID, MaxInvokeID, invID))
 	}
 	return nil
+}
+
+func newDialogueRequest(acn, acnVersion int) *DialogueTCAP {
+	return &DialogueTCAP{
+		DialogAsId: DefaultDialogueAsId,
+		DialogueRequest: &AARQapduTCAP{
+			ProtocolVersionPadded: uint8Ptr(DefaultProtocolVersion),
+			AcnVersion: func() []int {
+				newSlice := make([]int, len(DefaultAcnPrefix)+2)
+				copy(newSlice, DefaultAcnPrefix)
+				newSlice[len(DefaultAcnPrefix)] = acn
+				newSlice[len(DefaultAcnPrefix)+1] = acnVersion
+				return newSlice
+			}(),
+		},
+	}
+}
+
+func newDialogueResponse(acn, acnVersion int) *DialogueTCAP {
+	return &DialogueTCAP{
+		DialogAsId: DefaultDialogueAsId,
+		DialogueResponse: &AAREapduTCAP{
+			ProtocolVersionPadded: uint8Ptr(DefaultProtocolVersion),
+			AcnVersion: func() []int {
+				acnCopy := make([]int, len(DefaultAcnPrefix)+2)
+				copy(acnCopy, DefaultAcnPrefix)
+				return append(acnCopy, acn, acnVersion)
+			}(),
+		},
+	}
 }

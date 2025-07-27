@@ -184,7 +184,7 @@ func TestNewBegin(t *testing.T) {
 					t.Errorf("expected valid TCAP")
 					return
 				}
-				if tcap.Begin == nil {
+				if tcap.MessageType() != MessageTypeBegin {
 					t.Errorf("expected Begin field to be set")
 				}
 			}
@@ -250,9 +250,12 @@ func TestNewBeginInvoke(t *testing.T) {
 					t.Errorf("expected valid TCAP")
 					return
 				}
-				if tcap.Begin == nil || tcap.Begin.Components == nil || tcap.Begin.Components.Invoke == nil {
+
+				begin, ok := tcap.(*BeginTCAP)
+				if !ok || begin.Components == nil || begin.Components.Invoke == nil {
 					t.Errorf("expected Begin Invoke to be properly set")
 				}
+
 			}
 		})
 	}
@@ -308,7 +311,7 @@ func TestNewContinue(t *testing.T) {
 					t.Errorf("expected valid TCAP")
 					return
 				}
-				if tcap.Continue == nil {
+				if tcap.MessageType() != MessageTypeContinue {
 					t.Errorf("expected Continue field to be set")
 				}
 			}

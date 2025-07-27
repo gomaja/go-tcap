@@ -8,29 +8,14 @@ import (
 
 // care for int optional fields in asn1 structs, to omit a field, its value should be = 255 (FieldOmissionValue)
 
-func (tcTcap *TCAP) Marshal() ([]byte, error) {
-	var asn1Tcap asn1tcapmodel.TCMessage
-
-	// Convert based on which field is set in the TCAP struct
-	if tcTcap.Unidirectional != nil {
-		asn1Tcap.Unidirectional = convertUnidirectionalTCAPToUnidirectional(tcTcap.Unidirectional)
-	} else if tcTcap.Begin != nil {
-		asn1Tcap.Begin = convertBeginTCAPToBegin(tcTcap.Begin)
-	} else if tcTcap.End != nil {
-		asn1Tcap.End = convertEndTCAPToEnd(tcTcap.End)
-	} else if tcTcap.Continue != nil {
-		asn1Tcap.Continue = convertContinueTCAPToContinue(tcTcap.Continue)
-	} else if tcTcap.Abort != nil {
-		asn1Tcap.Abort = convertAbortTCAPToAbort(tcTcap.Abort)
-	}
-
+func marshalAsn1TcapModel(asn1Tcap asn1tcapmodel.TCMessage) ([]byte, error) {
 	// Marshal to bytes
 	bytes, err := asn1.Marshal(asn1Tcap)
 	if err != nil {
 		return nil, err
 	}
 
-	// reverse operation of parse for "Length have a special treatment"
+	// reverse operation of parse for "Length has a special treatment"
 	var rv asn1.RawValue
 	_, err = asn1.Unmarshal(bytes, &rv)
 	if err != nil {
@@ -150,7 +135,7 @@ func convertComponentsTCAPToBytes(cp *ComponentTCAP) ([]byte, error) {
 		return nil, err
 	}
 
-	// reverse operation of parse for "Length have a special treatment"
+	// reverse operation of parse for "Length has a special treatment"
 	var rv asn1.RawValue
 	_, err = asn1.Unmarshal(bytes, &rv)
 	if err != nil {

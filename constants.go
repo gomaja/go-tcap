@@ -25,4 +25,7 @@ const (
 var (
 	// DefaultDialogueAsId represents the standard TCAP dialogue object identifier
 	DefaultDialogueAsId = []int{0, 0, 17, 773, 1, 1, 1}
+
+	// DefaultAcnPrefix represents the prefix for the Application Context Name (ACN) in TCAP dialogue identifiers.
+	DefaultAcnPrefix = []int{0, 4, 0, 0, 1, 0}
 )
