@@ -160,7 +160,13 @@ func newDialogueRequest(acn, acnVersion int) *DialogueTCAP {
 		DialogAsId: DefaultDialogueAsId,
 		DialogueRequest: &AARQapduTCAP{
 			ProtocolVersionPadded: uint8Ptr(DefaultProtocolVersion),
-			AcnVersion:            append(DefaultAcnPrefix, acn, acnVersion),
+			AcnVersion: func() []int {
+				newSlice := make([]int, len(DefaultAcnPrefix)+2)
+				copy(newSlice, DefaultAcnPrefix)
+				newSlice[len(DefaultAcnPrefix)] = acn
+				newSlice[len(DefaultAcnPrefix)+1] = acnVersion
+				return newSlice
+			}(),
 		},
 	}
 }
