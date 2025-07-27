@@ -26,14 +26,10 @@ func NewEnd(dtid []byte, options ...EndOption) (TCAP, error) {
 	return tcEnd, nil
 }
 
-// WithEndDialogue adds a dialogue to an End TCAP message
-func WithEndDialogue(acn, acnVersion int) EndOption {
+// WithEndDialogueResponse adds a dialogue to an End TCAP message
+func WithEndDialogueResponse(acn, acnVersion int) EndOption {
 	return func(end *EndTCAP) error {
-		end.Dialogue = &DialogueTCAP{}
-		end.Dialogue.DialogueRequest = &AARQapduTCAP{}
-		end.Dialogue.DialogAsId = DefaultDialogueAsId
-		end.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
-		end.Dialogue.DialogueRequest.AcnVersion = append(DefaultAcnPrefix, acn, acnVersion)
+		end.Dialogue = newDialogueResponse(acn, acnVersion)
 		return nil
 	}
 }

@@ -33,14 +33,18 @@ func NewContinue(otid []byte, dtid []byte, options ...ContinueOption) (TCAP, err
 	return tcContinue, nil
 }
 
-// WithContinueDialogue adds a dialogue to a Continue TCAP message
-func WithContinueDialogue(acn, acnVersion int) ContinueOption {
+// WithContinueDialogueRequest adds a dialogue to a Continue TCAP message
+func WithContinueDialogueRequest(acn, acnVersion int) ContinueOption {
 	return func(cont *ContinueTCAP) error {
-		cont.Dialogue = &DialogueTCAP{}
-		cont.Dialogue.DialogueRequest = &AARQapduTCAP{}
-		cont.Dialogue.DialogAsId = DefaultDialogueAsId
-		cont.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
-		cont.Dialogue.DialogueRequest.AcnVersion = append(DefaultAcnPrefix, acn, acnVersion)
+		cont.Dialogue = newDialogueRequest(acn, acnVersion)
+		return nil
+	}
+}
+
+// WithContinueDialogueResponse adds a dialogue to a Continue TCAP message
+func WithContinueDialogueResponse(acn, acnVersion int) ContinueOption {
+	return func(cont *ContinueTCAP) error {
+		cont.Dialogue = newDialogueResponse(acn, acnVersion)
 		return nil
 	}
 }

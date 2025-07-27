@@ -1,6 +1,9 @@
 package tcap
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type MessageType string
 
@@ -114,6 +117,22 @@ type RejectTCAP struct {
 	ReturnErrorProblem      *uint8
 }
 
+func NewDialogueResponseFromDialogueRequest(dialogue *DialogueTCAP) (*DialogueTCAP, error) {
+	if dialogue == nil {
+		return nil, nil
+	}
+	if dialogue.DialogueRequest == nil {
+		return nil, errors.New("dialogue request is nil")
+	}
+	return &DialogueTCAP{
+		DialogAsId: dialogue.DialogAsId,
+		DialogueResponse: &AAREapduTCAP{
+			ProtocolVersionPadded: dialogue.DialogueRequest.ProtocolVersionPadded,
+			AcnVersion:            dialogue.DialogueRequest.AcnVersion,
+		},
+	}, nil
+}
+
 // validateTransactionID validates that a transaction ID meets ITU-T Q.773 requirements
 // Transaction ID must be 1 to 4 bytes in length
 func validateTransactionID(tid []byte, fieldName string) error {
@@ -134,4 +153,24 @@ func validateInvokeID(invID int, fieldName string) error {
 				MinInvokeID, MaxInvokeID, invID))
 	}
 	return nil
+}
+
+func newDialogueRequest(acn, acnVersion int) *DialogueTCAP {
+	return &DialogueTCAP{
+		DialogAsId: DefaultDialogueAsId,
+		DialogueRequest: &AARQapduTCAP{
+			ProtocolVersionPadded: uint8Ptr(DefaultProtocolVersion),
+			AcnVersion:            append(DefaultAcnPrefix, acn, acnVersion),
+		},
+	}
+}
+
+func newDialogueResponse(acn, acnVersion int) *DialogueTCAP {
+	return &DialogueTCAP{
+		DialogAsId: DefaultDialogueAsId,
+		DialogueResponse: &AAREapduTCAP{
+			ProtocolVersionPadded: uint8Ptr(DefaultProtocolVersion),
+			AcnVersion:            append(DefaultAcnPrefix, acn, acnVersion),
+		},
+	}
 }

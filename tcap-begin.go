@@ -28,14 +28,10 @@ func NewBegin(otid []byte, options ...BeginOption) (TCAP, error) {
 	return tcBegin, nil
 }
 
-// WithBeginDialogue adds a dialogue to a Begin TCAP message
-func WithBeginDialogue(acn, acnVersion int) BeginOption {
+// WithBeginDialogueRequest adds a dialogue to a Begin TCAP message
+func WithBeginDialogueRequest(acn, acnVersion int) BeginOption {
 	return func(begin *BeginTCAP) error {
-		begin.Dialogue = &DialogueTCAP{}
-		begin.Dialogue.DialogueRequest = &AARQapduTCAP{}
-		begin.Dialogue.DialogAsId = DefaultDialogueAsId
-		begin.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
-		begin.Dialogue.DialogueRequest.AcnVersion = append(DefaultAcnPrefix, acn, acnVersion)
+		begin.Dialogue = newDialogueRequest(acn, acnVersion)
 		return nil
 	}
 }
