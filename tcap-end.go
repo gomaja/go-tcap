@@ -34,14 +34,6 @@ func WithEndDialogueResponse(acn, acnVersion int) EndOption {
 	}
 }
 
-// WithEndDialogueObject adds a dialogue object to an End TCAP message
-func WithEndDialogueObject(dialogue *DialogueTCAP) EndOption {
-	return func(end *EndTCAP) error {
-		end.Dialogue = dialogue
-		return nil
-	}
-}
-
 // WithEndReturnResultLast adds a ReturnResultLast component to an End TCAP message
 func WithEndReturnResultLast(invID int, opCode *uint8, payload []byte) EndOption {
 	return func(end *EndTCAP) error {

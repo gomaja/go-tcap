@@ -36,14 +36,6 @@ func WithBeginDialogueRequest(acn, acnVersion int) BeginOption {
 	}
 }
 
-// WithBeginDialogueObject adds a dialogue object to a Begin TCAP message
-func WithBeginDialogueObject(dialogue *DialogueTCAP) BeginOption {
-	return func(begin *BeginTCAP) error {
-		begin.Dialogue = dialogue
-		return nil
-	}
-}
-
 // WithBeginInvoke adds an Invoke component to a Begin TCAP message
 func WithBeginInvoke(invID int, opCode uint8, payload []byte) BeginOption {
 	return func(begin *BeginTCAP) error {
