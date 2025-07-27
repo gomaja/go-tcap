@@ -1,5 +1,9 @@
 package tcap
 
+import (
+	"github.com/gomaja/go-tcap/asn1tcapmodel"
+)
+
 // ContinueOption represents a functional option for configuring Continue TCAP messages
 type ContinueOption func(*ContinueTCAP) error
 
@@ -7,7 +11,7 @@ type ContinueOption func(*ContinueTCAP) error
 // Parameters:
 //   - otid: Originating Transaction ID, size from 1 to 4 bytes in BigEndian format.
 //   - dtid: Destination Transaction ID, size from 1 to 4 bytes in BigEndian format.
-func NewContinue(otid []byte, dtid []byte, options ...ContinueOption) (*TCAP, error) {
+func NewContinue(otid []byte, dtid []byte, options ...ContinueOption) (TCAP, error) {
 	if err := validateTransactionID(otid, "otid"); err != nil {
 		return nil, err
 	}
@@ -15,20 +19,18 @@ func NewContinue(otid []byte, dtid []byte, options ...ContinueOption) (*TCAP, er
 		return nil, err
 	}
 
-	tcap := &TCAP{
-		Continue: &ContinueTCAP{
-			Otid: otid,
-			Dtid: dtid,
-		},
+	tcContinue := &ContinueTCAP{
+		Otid: otid,
+		Dtid: dtid,
 	}
 
 	for _, opt := range options {
-		if err := opt(tcap.Continue); err != nil {
+		if err := opt(tcContinue); err != nil {
 			return nil, err
 		}
 	}
 
-	return tcap, nil
+	return tcContinue, nil
 }
 
 // WithContinueDialogue adds a dialogue to a Continue TCAP message
@@ -85,4 +87,19 @@ func WithContinueReturnResultLast(invID int, opCode *uint8, payload []byte) Cont
 		}
 		return nil
 	}
+}
+
+func (tcContinue *ContinueTCAP) Marshal() ([]byte, error) {
+	var asn1Tcap asn1tcapmodel.TCMessage
+
+	// Convert based on which field is set in the TCAP struct
+	if tcContinue != nil {
+		asn1Tcap.Continue = convertContinueTCAPToContinue(tcContinue)
+	}
+
+	return marshalAsn1TcapModel(asn1Tcap)
+}
+
+func (tcContinue *ContinueTCAP) MessageType() MessageType {
+	return MessageTypeContinue
 }

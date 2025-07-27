@@ -1,29 +1,31 @@
 package tcap
 
+import (
+	"github.com/gomaja/go-tcap/asn1tcapmodel"
+)
+
 // BeginOption represents a functional option for configuring Begin TCAP messages
 type BeginOption func(*BeginTCAP) error
 
 // NewBegin creates a Begin TCAP message using the options pattern
 // Parameters:
 //   - otid: Originating Transaction ID, size from 1 to 4 bytes in BigEndian format.
-func NewBegin(otid []byte, options ...BeginOption) (*TCAP, error) {
+func NewBegin(otid []byte, options ...BeginOption) (TCAP, error) {
 	if err := validateTransactionID(otid, "otid"); err != nil {
 		return nil, err
 	}
 
-	tcap := &TCAP{
-		Begin: &BeginTCAP{
-			Otid: otid,
-		},
+	tcBegin := &BeginTCAP{
+		Otid: otid,
 	}
 
 	for _, opt := range options {
-		if err := opt(tcap.Begin); err != nil {
+		if err := opt(tcBegin); err != nil {
 			return nil, err
 		}
 	}
 
-	return tcap, nil
+	return tcBegin, nil
 }
 
 // WithBeginDialogue adds a dialogue to a Begin TCAP message
@@ -62,4 +64,19 @@ func WithBeginInvoke(invID int, opCode uint8, payload []byte) BeginOption {
 		}
 		return nil
 	}
+}
+
+func (tcBegin *BeginTCAP) Marshal() ([]byte, error) {
+	var asn1Tcap asn1tcapmodel.TCMessage
+
+	// Convert based on which field is set in the TCAP struct
+	if tcBegin != nil {
+		asn1Tcap.Begin = convertBeginTCAPToBegin(tcBegin)
+	}
+
+	return marshalAsn1TcapModel(asn1Tcap)
+}
+
+func (tcBegin *BeginTCAP) MessageType() MessageType {
+	return MessageTypeBegin
 }

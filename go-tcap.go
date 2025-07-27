@@ -2,13 +2,20 @@ package tcap
 
 import "fmt"
 
-// TCAP will have only one field fulfilled and the others will be nil
-type TCAP struct { // choice
-	Unidirectional *UnidirectionalTCAP
-	Begin          *BeginTCAP
-	End            *EndTCAP
-	Continue       *ContinueTCAP
-	Abort          *AbortTCAP
+type MessageType string
+
+const (
+	MessageTypeUnidirectional MessageType = "Unidirectional"
+	MessageTypeBegin          MessageType = "Begin"
+	MessageTypeEnd            MessageType = "End"
+	MessageTypeContinue       MessageType = "Continue"
+	MessageTypeAbort          MessageType = "Abort"
+)
+
+// TCAP will have only one field fulfilled, and the others will be nil
+type TCAP interface { // choice
+	Marshal() ([]byte, error)
+	MessageType() MessageType
 }
 
 type UnidirectionalTCAP struct {
