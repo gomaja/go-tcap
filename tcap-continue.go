@@ -49,6 +49,14 @@ func WithContinueDialogueResponse(acn, acnVersion int) ContinueOption {
 	}
 }
 
+// WithContinueDialogueObject adds a dialogue object to a Continue TCAP message
+func WithContinueDialogueObject(dialogue *DialogueTCAP) ContinueOption {
+	return func(cont *ContinueTCAP) error {
+		cont.Dialogue = dialogue
+		return nil
+	}
+}
+
 // WithContinueInvoke adds an Invoke component to a Continue TCAP message
 func WithContinueInvoke(invID int, opCode uint8, payload []byte) ContinueOption {
 	return func(cont *ContinueTCAP) error {
