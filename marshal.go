@@ -135,7 +135,7 @@ func convertComponentsTCAPToBytes(cp *ComponentTCAP) ([]byte, error) {
 		return nil, err
 	}
 
-	// reverse operation of parse for "Length have a special treatment"
+	// reverse operation of parse for "Length has a special treatment"
 	var rv asn1.RawValue
 	_, err = asn1.Unmarshal(bytes, &rv)
 	if err != nil {
