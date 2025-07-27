@@ -35,7 +35,7 @@ func WithBeginDialogue(acn, acnVersion int) BeginOption {
 		begin.Dialogue.DialogueRequest = &AARQapduTCAP{}
 		begin.Dialogue.DialogAsId = DefaultDialogueAsId
 		begin.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
-		begin.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, acn, acnVersion}
+		begin.Dialogue.DialogueRequest.AcnVersion = append(DefaultAcnPrefix, acn, acnVersion)
 		return nil
 	}
 }

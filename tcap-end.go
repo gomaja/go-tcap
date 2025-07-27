@@ -33,7 +33,7 @@ func WithEndDialogue(acn, acnVersion int) EndOption {
 		end.Dialogue.DialogueRequest = &AARQapduTCAP{}
 		end.Dialogue.DialogAsId = DefaultDialogueAsId
 		end.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
-		end.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, acn, acnVersion}
+		end.Dialogue.DialogueRequest.AcnVersion = append(DefaultAcnPrefix, acn, acnVersion)
 		return nil
 	}
 }

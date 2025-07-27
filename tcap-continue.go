@@ -40,7 +40,7 @@ func WithContinueDialogue(acn, acnVersion int) ContinueOption {
 		cont.Dialogue.DialogueRequest = &AARQapduTCAP{}
 		cont.Dialogue.DialogAsId = DefaultDialogueAsId
 		cont.Dialogue.DialogueRequest.ProtocolVersionPadded = uint8Ptr(DefaultProtocolVersion)
-		cont.Dialogue.DialogueRequest.AcnVersion = []int{0, 4, 0, 0, 1, 0, acn, acnVersion}
+		cont.Dialogue.DialogueRequest.AcnVersion = append(DefaultAcnPrefix, acn, acnVersion)
 		return nil
 	}
 }
