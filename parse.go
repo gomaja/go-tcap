@@ -2,9 +2,9 @@ package tcap
 
 import (
 	"encoding/asn1"
-	"errors"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/gomaja/go-tcap/asn1tcapmodel"
 	"github.com/gomaja/go-tcap/utils"
@@ -18,7 +18,7 @@ func uint8Ptr(i int) *uint8 {
 func ParseAny(b []byte) (TCAP, error) {
 	// Parse first with ParseDER and check for error
 	tcap, err := ParseDER(b)
-	if err != nil && errors.Is(err, ErrIndefiniteLength) {
+	if err != nil && strings.Contains(err.Error(), IndefiniteLengthErrorString) {
 		// If ParseDER showed an error due to indefinite-length type (not DER), then convert to DER
 		derBytes, err := utils.MakeDER(b) // bytes will remain the same if the provided bytes are already DER, otherwise they are converted to from non-DER (indefinite length) to DER
 		if err != nil {
