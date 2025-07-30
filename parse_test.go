@@ -149,6 +149,11 @@ func TestNonDERToDER(t *testing.T) {
 			input:       "6443490400519a286b2a2828060700118605010101a01d611b80020780a109060704000001001903a203020100a305a1030201006c80a30b02010002010630030201010000",
 			expectError: false,
 		},
+		{
+			name:        "Tcap stream containing indefinite length (Non-DER). (returnResultLast sendRoutingInfoForSM)",
+			input:       "64574904000acb776b2a2828060700118605010101a01d611b80020780a109060704000001001403a203020100a305a1030201006c80a21f020100301a02012d3015040873000400960848f6a0098107918192039619f40000",
+			expectError: false,
+		},
 	}
 
 	for _, tc := range tests {
@@ -174,6 +179,10 @@ func TestNonDERToDER(t *testing.T) {
 				t.Errorf("marshalled bytes don't match")
 			}
 
+			tc, err = ParseAny(bytesNonDER)
+			if err != nil {
+				t.Errorf("failed to parse input with ParseAny: %v", err)
+			}
 		})
 	}
 }

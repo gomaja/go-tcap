@@ -5,13 +5,15 @@ import (
 	"fmt"
 )
 
+// ASN1 standard package error string
+const (
+	IndefiniteLengthErrorString = "indefinite length found (not DER)"
+)
+
 // Error types for better error handling and debugging
 var (
 	// ErrInvalidInput indicates invalid input data
 	ErrInvalidInput = errors.New("invalid input data")
-
-	// ErrIndefiniteLength indicates non-DER encoding with indefinite length
-	ErrIndefiniteLength = errors.New("indefinite length found (not DER)")
 
 	// ErrEmptyData indicates empty or nil data
 	ErrEmptyData = errors.New("empty data provided")
