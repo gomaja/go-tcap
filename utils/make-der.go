@@ -148,7 +148,20 @@ func encodeDER(obj ASN1Object) ([]byte, error) {
 			return nil, err
 		}
 	} else {
-		content = obj.Value
+		// Handle boolean normalization for DER
+		// In TCAP, context-specific tag 1 (0x81) is commonly used for boolean values
+		// and must be normalized according to DER rules
+		if len(obj.Value) == 1 && (obj.Tag == 0x01 || obj.Tag == 0x81) {
+			// Boolean values must be 0x00 (false) or 0xFF (true) in DER
+			// Any non-zero value is normalized to 0xFF
+			if obj.Value[0] != 0x00 {
+				content = []byte{0xFF}
+			} else {
+				content = []byte{0x00}
+			}
+		} else {
+			content = obj.Value
+		}
 	}
 
 	// Encode length
