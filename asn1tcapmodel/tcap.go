@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-type TCMessage struct { // choice
+type TCMessage struct { // CHOICE
 	Unidirectional Unidirectional `asn1:"application,tag:1,optional"`
 	Begin          Begin          `asn1:"application,tag:2,optional"`
 	End            End            `asn1:"application,tag:4,optional"`
@@ -81,7 +81,7 @@ func (p PAbortCauseInt) String() string {
 	}
 }
 
-type ComponentPortion struct { // choice
+type ComponentPortion struct { // CHOICE
 	Invoke              Invoke       `asn1:"tag:1,optional"`
 	ReturnResultLast    ReturnResult `asn1:"tag:2,optional"`
 	ReturnError         ReturnError  `asn1:"tag:3,optional"`
@@ -132,14 +132,14 @@ type ReturnError struct {
 }
 
 type Reject struct {
-	//RejectInvokeIDRej // choice
+	//RejectInvokeIDRej // CHOICE
 	//value must be: asn1.RawValue{Class: asn1.ClassUniversal, Tag: asn1.TagInteger, Bytes: []byte{byte(DerivableInt)}}
 	//Derivable asn1.RawValue `asn1:"optional"` // the actual InvokeIdType
 	//value must be: asn1.RawValue{Class: asn1.ClassUniversal, Tag: asn1.TagNull, Bytes: []byte{byte(DerivableInt)}}
 	//NotDerivable asn1.RawValue `asn1:"optional"` // represents NULL // tag = 5 dec
 	DerivableOrNotDerivable asn1.RawValue // fill it here and verify if Derivable or NotDerivable after
 
-	//RejectProblem // choice
+	//RejectProblem // CHOICE
 	// GeneralProblemInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 (FieldOmissionValue) is used to check if the field arrived was empty
 	GeneralProblem int `asn1:"default:255,tag:0,optional"`
 	// InvokeProblemInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 (FieldOmissionValue) is used to check if the field arrived was empty

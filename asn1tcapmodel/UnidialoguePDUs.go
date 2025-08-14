@@ -13,7 +13,7 @@ type UniDialogueAll struct {
 	UniDialoguePDU UniDialoguePDU `asn1:"tag:0"` // TODO: verify tag
 }
 
-type UniDialoguePDU struct { // choice
+type UniDialoguePDU struct { // CHOICE
 	UniDialoguePDU AUDTApdu `asn1:"application,tag:0,optional"`
 }
 

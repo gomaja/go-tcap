@@ -207,25 +207,24 @@ func convertRejectTCAPToReject(rj *RejectTCAP) asn1tcapmodel.Reject {
 		}
 	}
 
-	if rj.GeneralProblem != nil {
+	// omit all then check which one should be present as CHOICE
+	result.GeneralProblem = FieldOmissionValue
+	result.InvokeProblem = FieldOmissionValue
+	result.ReturnResultProblem = FieldOmissionValue
+	result.ReturnErrorProblem = FieldOmissionValue
+	// switch case helps with CHOICE asn1
+	switch {
+	case rj.GeneralProblem != nil:
 		result.GeneralProblem = int(*rj.GeneralProblem)
-	} else {
-		result.GeneralProblem = FieldOmissionValue
-	}
-	if rj.InvokeProblem != nil {
+	case rj.InvokeProblem != nil:
 		result.InvokeProblem = int(*rj.InvokeProblem)
-	} else {
-		result.InvokeProblem = FieldOmissionValue
-	}
-	if rj.ReturnResultProblem != nil {
+	case rj.ReturnResultProblem != nil:
 		result.ReturnResultProblem = int(*rj.ReturnResultProblem)
-	} else {
-		result.ReturnResultProblem = FieldOmissionValue
-	}
-	if rj.ReturnErrorProblem != nil {
+	case rj.ReturnErrorProblem != nil:
 		result.ReturnErrorProblem = int(*rj.ReturnErrorProblem)
-	} else {
-		result.ReturnErrorProblem = FieldOmissionValue
+	default:
+		// fallback to satisfy CHOICE
+		result.GeneralProblem = int(asn1tcapmodel.UnrecognizedComponent)
 	}
 
 	return result
@@ -293,18 +292,20 @@ func convertAAREapduTCAPToAAREapdu(aare *AAREapduTCAP) asn1tcapmodel.AAREapdu {
 
 	result.Result = asn1tcapmodel.AssociateResult{Data: int(aare.Result)}
 
-	if aare.ResultSourceDiagnostic.DialogueServiceUser != nil {
-		result.ResultSourceDiagnostic = asn1tcapmodel.AssociateSourceDiagnostic{
-			DialogueServiceUser:     int(*aare.ResultSourceDiagnostic.DialogueServiceUser),
-			DialogueServiceProvider: FieldOmissionValue, // omit the field with this default number (magic number used in asn1 structs)
-		}
+	// omit all then check which one should be present as CHOICE
+	result.ResultSourceDiagnostic = asn1tcapmodel.AssociateSourceDiagnostic{
+		DialogueServiceUser:     FieldOmissionValue, // omit the field with this default number (magic number used in asn1 structs)
+		DialogueServiceProvider: FieldOmissionValue, // omit the field with this default number (magic number used in asn1 structs)
 	}
-
-	if aare.ResultSourceDiagnostic.DialogueServiceProvider != nil {
-		result.ResultSourceDiagnostic = asn1tcapmodel.AssociateSourceDiagnostic{
-			DialogueServiceUser:     FieldOmissionValue, // omit the field with this default number (magic number used in asn1 structs)
-			DialogueServiceProvider: int(*aare.ResultSourceDiagnostic.DialogueServiceProvider),
-		}
+	// switch case helps with CHOICE asn1
+	switch {
+	case aare.ResultSourceDiagnostic.DialogueServiceUser != nil:
+		result.ResultSourceDiagnostic.DialogueServiceUser = int(*aare.ResultSourceDiagnostic.DialogueServiceUser)
+	case aare.ResultSourceDiagnostic.DialogueServiceProvider != nil:
+		result.ResultSourceDiagnostic.DialogueServiceProvider = int(*aare.ResultSourceDiagnostic.DialogueServiceProvider)
+	default:
+		// fallback to satisfy CHOICE
+		result.ResultSourceDiagnostic.DialogueServiceUser = int(asn1tcapmodel.ASDUserNull)
 	}
 
 	if aare.UserInformation != nil {

@@ -15,8 +15,8 @@ const (
 	MessageTypeAbort          MessageType = "Abort"
 )
 
-// TCAP represents a choice of TCAP message types such as Unidirectional, Begin, End, Continue, or Abort.
-type TCAP interface { // choice
+// TCAP represents a CHOICE of TCAP message types such as Unidirectional, Begin, End, Continue, or Abort.
+type TCAP interface { // CHOICE
 	Marshal() ([]byte, error)
 	MessageType() MessageType
 }
@@ -82,7 +82,7 @@ type ABRTapduTCAP struct {
 }
 
 // ComponentTCAP will have only one field fulfilled and the others will be nil, except MoreComponents may exist additionally to any other field
-type ComponentTCAP struct { // choice Invoke, ReturnResultLast, ReturnError, Reject, ReturnResultNotLast
+type ComponentTCAP struct { // CHOICE Invoke, ReturnResultLast, ReturnError, Reject, ReturnResultNotLast
 	Invoke              *InvokeTCAP
 	ReturnResultLast    *ReturnResultTCAP
 	ReturnError         *ReturnErrorTCAP
