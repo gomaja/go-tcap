@@ -304,7 +304,9 @@ func convertAAREapduTCAPToAAREapdu(aare *AAREapduTCAP) asn1tcapmodel.AAREapdu {
 	case aare.ResultSourceDiagnostic.DialogueServiceProvider != nil:
 		result.ResultSourceDiagnostic.DialogueServiceProvider = int(*aare.ResultSourceDiagnostic.DialogueServiceProvider)
 	default:
-		// fallback to satisfy CHOICE
+		// According to the ASN.1 specification for AAREapdu, ResultSourceDiagnostic is a CHOICE type.
+		// When neither DialogueServiceUser nor DialogueServiceProvider is present, ASDUserNull is used as the default value
+		// to satisfy the CHOICE requirement, indicating a "null" diagnostic from the user side.
 		result.ResultSourceDiagnostic.DialogueServiceUser = int(asn1tcapmodel.ASDUserNull)
 	}
 
