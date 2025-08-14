@@ -15,8 +15,8 @@ const (
 	MessageTypeAbort          MessageType = "Abort"
 )
 
-// TCAP represents a choice of TCAP message types such as Unidirectional, Begin, End, Continue, or Abort.
-type TCAP interface { // choice
+// TCAP represents a CHOICE of TCAP message types such as Unidirectional, Begin, End, Continue, or Abort.
+type TCAP interface { // CHOICE
 	Marshal() ([]byte, error)
 	MessageType() MessageType
 }
@@ -82,7 +82,7 @@ type ABRTapduTCAP struct {
 }
 
 // ComponentTCAP will have only one field fulfilled and the others will be nil, except MoreComponents may exist additionally to any other field
-type ComponentTCAP struct { // choice Invoke, ReturnResultLast, ReturnError, Reject, ReturnResultNotLast
+type ComponentTCAP struct { // CHOICE Invoke, ReturnResultLast, ReturnError, Reject, ReturnResultNotLast
 	Invoke              *InvokeTCAP
 	ReturnResultLast    *ReturnResultTCAP
 	ReturnError         *ReturnErrorTCAP
@@ -117,20 +117,22 @@ type RejectTCAP struct {
 	ReturnErrorProblem      *uint8
 }
 
-func NewDialogueResponseFromDialogueRequest(dialogue *DialogueTCAP) (*DialogueTCAP, error) {
-	if dialogue == nil {
+func NewDialogueResponseFromDialogueRequest(dialogueRQ *DialogueTCAP) (dialogueRE *DialogueTCAP, err error) {
+	if dialogueRQ == nil {
 		return nil, nil
 	}
-	if dialogue.DialogueRequest == nil {
+	if dialogueRQ.DialogueRequest == nil {
 		return nil, errors.New("dialogue request is nil")
 	}
-	return &DialogueTCAP{
-		DialogAsId: dialogue.DialogAsId,
+
+	dialogueRE = &DialogueTCAP{
+		DialogAsId: dialogueRQ.DialogAsId,
 		DialogueResponse: &AAREapduTCAP{
-			ProtocolVersionPadded: dialogue.DialogueRequest.ProtocolVersionPadded,
-			AcnVersion:            dialogue.DialogueRequest.AcnVersion,
+			ProtocolVersionPadded: dialogueRQ.DialogueRequest.ProtocolVersionPadded,
+			AcnVersion:            dialogueRQ.DialogueRequest.AcnVersion,
 		},
-	}, nil
+	}
+	return dialogueRE, nil
 }
 
 // validateTransactionID validates that a transaction ID meets ITU-T Q.773 requirements

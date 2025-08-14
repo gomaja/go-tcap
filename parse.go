@@ -407,7 +407,7 @@ func convertAAREapduToAAREapduTCAP(aare *asn1tcapmodel.AAREapdu) *AAREapduTCAP {
 	// Result
 	aareTcap.Result = uint8(aare.Result.Data)
 
-	// ResultSourceDiagnostic // choice
+	// ResultSourceDiagnostic // CHOICE
 	if aare.ResultSourceDiagnostic.DialogueServiceUser != FieldOmissionValue { // check optional field if empty
 		aareTcap.ResultSourceDiagnostic.DialogueServiceUser = uint8Ptr(int(aare.ResultSourceDiagnostic.DialogueServiceUser))
 	}

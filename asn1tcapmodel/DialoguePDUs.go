@@ -13,7 +13,7 @@ type DialogueAll struct {
 	DialoguePDU DialoguePDU `asn1:"tag:0"`
 }
 
-type DialoguePDU struct { // choice
+type DialoguePDU struct { // CHOICE
 	DialogueRequest  AARQapdu `asn1:"application,tag:0,optional"`
 	DialogueResponse AAREapdu `asn1:"application,tag:1,optional"`
 	DialogueAbort    ABRTapdu `asn1:"application,tag:4,optional"`
@@ -73,7 +73,7 @@ const (
 	AssociateResultRejectPermanent AssociateResultInt = 1
 )
 
-type AssociateSourceDiagnostic struct { // choice
+type AssociateSourceDiagnostic struct { // CHOICE
 	// AssociateSourceDiagUserInt // default:255 will change omitting the optional field to value 255 instead of 0, the 255 (FieldOmissionValue) is used to check if the field arrived was empty
 	DialogueServiceUser int `asn1:"default:255,tag:1,explicit,optional"`
 
