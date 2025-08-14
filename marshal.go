@@ -223,7 +223,7 @@ func convertRejectTCAPToReject(rj *RejectTCAP) asn1tcapmodel.Reject {
 	case rj.ReturnErrorProblem != nil:
 		result.ReturnErrorProblem = int(*rj.ReturnErrorProblem)
 	default:
-		// fallback to satisfy CHOICE
+		// Per ITU-T Q.773, if no specific problem type is present, UnrecognizedComponent is used as the default for the CHOICE to indicate an unrecognized problem.
 		result.GeneralProblem = int(asn1tcapmodel.UnrecognizedComponent)
 	}
 
