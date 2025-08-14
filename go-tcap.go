@@ -117,20 +117,22 @@ type RejectTCAP struct {
 	ReturnErrorProblem      *uint8
 }
 
-func NewDialogueResponseFromDialogueRequest(dialogue *DialogueTCAP) (*DialogueTCAP, error) {
-	if dialogue == nil {
+func NewDialogueResponseFromDialogueRequest(dialogueRQ *DialogueTCAP) (dialogueRE *DialogueTCAP, err error) {
+	if dialogueRQ == nil {
 		return nil, nil
 	}
-	if dialogue.DialogueRequest == nil {
+	if dialogueRQ.DialogueRequest == nil {
 		return nil, errors.New("dialogue request is nil")
 	}
-	return &DialogueTCAP{
-		DialogAsId: dialogue.DialogAsId,
+
+	dialogueRE = &DialogueTCAP{
+		DialogAsId: dialogueRQ.DialogAsId,
 		DialogueResponse: &AAREapduTCAP{
-			ProtocolVersionPadded: dialogue.DialogueRequest.ProtocolVersionPadded,
-			AcnVersion:            dialogue.DialogueRequest.AcnVersion,
+			ProtocolVersionPadded: dialogueRQ.DialogueRequest.ProtocolVersionPadded,
+			AcnVersion:            dialogueRQ.DialogueRequest.AcnVersion,
 		},
-	}, nil
+	}
+	return dialogueRE, nil
 }
 
 // validateTransactionID validates that a transaction ID meets ITU-T Q.773 requirements
