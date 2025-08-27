@@ -60,6 +60,24 @@ func WithEndReturnResultLast(invID int, opCode *uint8, payload []byte) EndOption
 	}
 }
 
+// WithEndReturnError adds a ReturnError component to an End TCAP message
+func WithEndReturnError(invID int, errorCode uint8, parameter []byte) EndOption {
+	return func(end *EndTCAP) error {
+		if err := validateInvokeID(invID, "invID"); err != nil {
+			return err
+		}
+		if end.Components == nil {
+			end.Components = &ComponentTCAP{}
+		}
+		end.Components.ReturnError = &ReturnErrorTCAP{
+			InvokeID:  invID,
+			ErrorCode: errorCode,
+			Parameter: parameter,
+		}
+		return nil
+	}
+}
+
 func (tcEnd *EndTCAP) Marshal() ([]byte, error) {
 	var asn1Tcap asn1tcapmodel.TCMessage
 

@@ -183,6 +183,13 @@ func TestNonDERToDER(t *testing.T) {
 			if err != nil {
 				t.Errorf("failed to parse input with ParseAny: %v", err)
 			}
+			marshalled, err = tc.Marshal()
+			if err != nil {
+				t.Errorf("failed to marshal input: %v", err)
+			}
+			if string(marshalled) != string(derBytes) {
+				t.Errorf("marshalled bytes don't match")
+			}
 		})
 	}
 }
