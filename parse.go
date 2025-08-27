@@ -2,7 +2,6 @@ package tcap
 
 import (
 	"encoding/asn1"
-	"fmt"
 	"reflect"
 	"strings"
 
@@ -24,8 +23,6 @@ func ParseAny(b []byte) (TCAP, error) {
 		if err != nil {
 			return nil, newParseError("ParseAny", "MakeDER", err)
 		}
-
-		fmt.Println("Detected a non-DER (indefinite length)")
 
 		return ParseDER(derBytes)
 	}
