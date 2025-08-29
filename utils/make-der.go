@@ -210,7 +210,7 @@ func encodeDER(obj ASN1Object) ([]byte, error) {
 				var strContent []byte
 				for i, sub := range obj.SubObjects {
 					if !(sub.Class == 0 && sub.TagNumber == obj.TagNumber && !sub.IsConstructed) {
-						return nil, fmt.Errorf("Constructed string (tag %d) has invalid sub-element at index %d", obj.TagNumber, i)
+						return nil, fmt.Errorf("constructed string (tag %d) has invalid sub-element at index %d", obj.TagNumber, i)
 					}
 					strContent = append(strContent, sub.Value...)
 				}
