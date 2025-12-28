@@ -278,7 +278,7 @@ func encodeDER(obj ASN1Object) ([]byte, error) {
 	// --- Encode Tag ---
 	var tagBytes []byte
 	// Construct the first identifier octet from class and constructed flag
-	var firstOctet byte = byte((obj.Class & 0x3) << 6)
+	firstOctet := byte((obj.Class & 0x3) << 6)
 	if obj.IsConstructed {
 		firstOctet |= 0x20 // set constructed bit
 	}
