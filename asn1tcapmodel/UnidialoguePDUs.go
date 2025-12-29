@@ -10,7 +10,7 @@ type UniDialogueAll struct {
 	//use value: asn1.ObjectIdentifier([]int{0, 0, 17, 773, 1, 2, 1})
 	UniDialogueAsId asn1.ObjectIdentifier `asn1:"optional"`
 
-	UniDialoguePDU UniDialoguePDU `asn1:"tag:0"` // TODO: verify tag
+	UniDialoguePDU UniDialoguePDU `asn1:"tag:0"`
 }
 
 type UniDialoguePDU struct { // CHOICE
