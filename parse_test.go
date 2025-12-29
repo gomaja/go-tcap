@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/gomaja/go-tcap/utils"
+	"github.com/gomaja/go-asn1utils"
 )
 
 // This test should only contain DER encoded asn1 structs
@@ -162,7 +162,7 @@ func TestNonDERToDER(t *testing.T) {
 			if err != nil {
 				t.Errorf("Error decoding hex: %v", err)
 			}
-			derBytes, err := utils.MakeDER(bytesNonDER)
+			derBytes, err := asn1utils.MakeDER(bytesNonDER)
 			if err != nil {
 				t.Errorf("Error converting to DER: %v", err)
 			}
