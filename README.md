@@ -2,9 +2,12 @@
 
 A robust ASN.1 TCAP (Transaction Capabilities Application Part) implementation from ITU-T Q.773 (06/97).
 
+[![Go Version](https://img.shields.io/github/go-mod/go-version/gomaja/go-tcap)](https://github.com/gomaja/go-tcap/blob/main/go.mod)
 [![Go CI](https://github.com/gomaja/go-tcap/actions/workflows/ci.yml/badge.svg)](https://github.com/gomaja/go-tcap/actions/workflows/ci.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/gomaja/go-tcap.svg)](https://pkg.go.dev/github.com/gomaja/go-tcap)
 [![Go Report Card](https://goreportcard.com/badge/github.com/gomaja/go-tcap)](https://goreportcard.com/report/github.com/gomaja/go-tcap)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=gomaja_go-tcap&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=gomaja_go-tcap)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=gomaja_go-tcap&metric=coverage)](https://sonarcloud.io/summary/new_code?id=gomaja_go-tcap)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
