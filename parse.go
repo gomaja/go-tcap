@@ -104,7 +104,12 @@ func convertUnidirectionalToUnidirectionalTCAP(ud *asn1tcapmodel.Unidirectional)
 	}
 
 	// fill Components
-	udTcap.Components = *convertComponentPortionToComponentsTCAP(&ud.Components)
+	comps := convertComponentPortionToComponentsTCAP(&ud.Components)
+	if comps != nil {
+		udTcap.Components = *comps
+	} else {
+		udTcap.Components = ComponentTCAP{}
+	}
 
 	return &udTcap
 }
@@ -349,8 +354,10 @@ func convertDialoguePortionToDialogueTCAP(dp *asn1tcapmodel.DialoguePortion) *Di
 	var DiagAll asn1tcapmodel.DialogueAll
 	// modify the tag to a SEQUENCE tag with constructor type (the ASN1 library in go works like this, SEQUENCE tag should be for structs with constructor type)
 	DiagAllBytes := dp.Data.FullBytes
-	DiagAllBytes[0] = SequenceConstructorTag // overwrite the EXTERNAL tag (EXTERNAL Constructor) to the known struct tag for asn1
-	_, _ = asn1.Unmarshal(DiagAllBytes, &DiagAll)
+	if len(DiagAllBytes) > 0 {
+		DiagAllBytes[0] = SequenceConstructorTag // overwrite the EXTERNAL tag (EXTERNAL Constructor) to the known struct tag for asn1
+		_, _ = asn1.Unmarshal(DiagAllBytes, &DiagAll)
+	}
 
 	if !reflect.ValueOf(DiagAll.DialogueAsId).IsZero() { // check optional field if empty
 		dpTCAP.DialogAsId = []int(DiagAll.DialogueAsId)
